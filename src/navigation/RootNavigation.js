@@ -38,6 +38,7 @@ import ChoosePaymentMethod from '../screens/guideScreens/Payment/ChoosePaymentMe
 import PaymentDetail from '../screens/guideScreens/Payment/PaymentDetail';
 import GuideCompleteProfile from '../screens/guideScreens/GuideCompleteProfile';
 import GuideEditProfile from '../screens/guideScreens/GuideEditProfile';
+import UserEditProfile from '../screens/userScreens/UserEditProfile';
 
 const Stack = createNativeStackNavigator();
 
@@ -178,6 +179,10 @@ function RootNavigation() {
         <Stack.Screen
           name={config.routes.GUIDE_EDIT_PROFILE}
           component={GuideEditProfile}
+        />
+        <Stack.Screen
+          name={config.routes.USER_EDIT_PROFILE}
+          component={UserEditProfile}
         />
 
         <Stack.Screen name={config.routes.MY_PACKAGE} component={MyPackage} />

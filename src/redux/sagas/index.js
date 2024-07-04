@@ -11,6 +11,7 @@ import { watchUserRoadTrip } from './userSaga/UserRoadTripSaga';
 import { watchUserOffRoadTrip } from './userSaga/UserOffRoadTripSaga';
 import { watchUserFilterApi } from './userSaga/UserFilterApiSaga';
 import { watchUserCreateTrip } from './userSaga/UserCreateTripSaga';
+import { watchUserGetAllTrips } from './userSaga/UserGetTripListSaga';
 
 /* ------------------- GUIDE -------------- */
 import { watchGuideGetProfile } from './guideSaga/GuideGetProfileSaga';
@@ -35,6 +36,7 @@ export default function* rootSaga() {
     fork(watchUserFilterApi),
     fork(watchUserCreateTrip),
     fork(watchUserTripMemoriesCount),
+    fork(watchUserGetAllTrips),
 
     /* ------------------- GUIDE -------------- */
    fork(watchGuideGetProfile),

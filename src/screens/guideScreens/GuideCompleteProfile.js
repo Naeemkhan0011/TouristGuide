@@ -382,8 +382,8 @@ const GuideCompleteProfile = ({navigation}) => {
               }}
             />
           </TouchableOpacity>
-          {activityDropDown && (
-            <>
+          {/* {activityDropDown && (
+            <> */}
               <TouchableOpacity
                 style={{
                   height: 56,
@@ -509,8 +509,8 @@ const GuideCompleteProfile = ({navigation}) => {
                   }}
                 />
               </TouchableOpacity>
-            </>
-          )}
+            {/* </>
+          )} */}
 
           <Text
             style={{

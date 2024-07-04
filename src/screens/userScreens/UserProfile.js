@@ -32,7 +32,7 @@ const UserProfile = ({navigation}) => {
     AsyncStorage.removeItem(config.AsyncKeys.USER_DATA);
     AsyncStorage.removeItem(config.AsyncKeys.USER_TOKEN);
 
-    goToTopNavigation(config.routes.LANGUAGE);
+    goToTopNavigation(config.routes.USER_LOGIN_SCREEN,{from:'logout'});
   }, 100);
 
   return ()=> clearTimeout(subscribe)
@@ -242,10 +242,7 @@ const UserProfile = ({navigation}) => {
               backgroundColor: config.colors.whiteSmokeColor,
             }}>
             <TouchableOpacity style={{flexDirection: 'row'}} onPress={() => {
-              Toast.show({
-                 type: 'custom',
-                text1:'Coming Soon'
-              })
+             navigation.navigate(config.routes.USER_EDIT_PROFILE)
             }}>
               <Image
                 source={config.images.USER_ICON}
@@ -269,10 +266,7 @@ const UserProfile = ({navigation}) => {
             </TouchableOpacity>
 
             <TouchableOpacity style={{marginTop: 15, flexDirection: 'row'}} onPress={() => {
-              Toast.show({
-                 type: 'custom',
-                text1:'Coming Soon'
-              })
+             navigation.navigate(config.routes.MY_TRIP)
             }}>
               <Image
                 source={config.images.TRIP_ICON}

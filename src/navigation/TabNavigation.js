@@ -73,8 +73,7 @@ const UserTabs = () => {
 
       <Tab.Screen
         name={config.routes.MY_TRIP}
-        component={GuideCompleteProfile}
-        // component={MyTrip}
+        component={MyTrip}
         options={{
           tabBarLabel: config.routes.USER_HOME_SCREEN,
           tabBarIcon: ({color, size, focused}) => (

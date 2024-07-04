@@ -8,38 +8,38 @@ import {
   TextInput,
   TouchableOpacity,
   View,
-} from 'react-native';
-import React, {useEffect, useState} from 'react';
-import config from '../../config';
-import AppTextInput from '../../components/AppTextInput';
-import DateTimePickerModal from 'react-native-modal-datetime-picker';
-import AppButton from '../../components/AppButton';
-import {useDispatch, useSelector} from 'react-redux';
+} from "react-native";
+import React, { useEffect, useState } from "react";
+import config from "../../config";
+import AppTextInput from "../../components/AppTextInput";
+import DateTimePickerModal from "react-native-modal-datetime-picker";
+import AppButton from "../../components/AppButton";
+import { useDispatch, useSelector } from "react-redux";
 import {
   UserCreateTripReducer,
   UserGetProfileReducer,
-} from '../../redux/reducers';
-import Toast from 'react-native-toast-message';
-import {SagaActions} from '../../redux/sagas/SagaActions';
-import moment from 'moment';
+} from "../../redux/reducers";
+import Toast from "react-native-toast-message";
+import { SagaActions } from "../../redux/sagas/SagaActions";
+import moment from "moment";
 
-const UserCreateTrip = ({navigation}) => {
+const UserCreateTrip = ({ navigation }) => {
   const dispatch = useDispatch();
   const userCreateTripResponse = useSelector(
-    UserCreateTripReducer.selectUserCreateTripData,
+    UserCreateTripReducer.selectUserCreateTripData
   );
   const userCreateTripErrorResponse = useSelector(
-    UserCreateTripReducer.selectUserCreateTripResponse,
+    UserCreateTripReducer.selectUserCreateTripResponse
   );
   const userGetProfileResponse = useSelector(
-    UserGetProfileReducer.selectUserGetProfileData,
+    UserGetProfileReducer.selectUserGetProfileData
   );
-  const [numberOfGuest, setNumberOfGuest] = useState('');
-  const [destination, setDestination] = useState([{id: 1, value: ''}]);
-  const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState('');
-  const [writeNotes, setWriteNotes] = useState('');
-  const [selectActivity, setSelectActivity] = useState('All');
+  const [numberOfGuest, setNumberOfGuest] = useState("");
+  const [destination, setDestination] = useState([{ id: 1, value: "" }]);
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [writeNotes, setWriteNotes] = useState("");
+  const [selectActivity, setSelectActivity] = useState("All");
   const [activities, setActivities] = useState([]);
   const [inputCount, setInputCount] = useState(1);
   const [selectSpatialCare, setSelectSpatialCare] = useState([]);
@@ -48,14 +48,14 @@ const UserCreateTrip = ({navigation}) => {
   const [showEndDate, setShowEndDate] = useState(false);
   const [selectAll, setSelectAll] = useState(false);
   const isAllSelected = activities.length == 5;
-  console.log('isAllSelected',isAllSelected, );
-  console.log('activities',activities, activities.length);
+  console.log("isAllSelected", isAllSelected);
+  console.log("activities", activities, activities.length);
   const activitiesList = [
-    'Camping',
-    'Wildlife Viewing',
-    'Bonfire',
-    'Boat Tourink',
-    'Hiking',
+    "Camping",
+    "Wildlife Viewing",
+    "Bonfire",
+    "Boat Tourink",
+    "Hiking",
   ];
 
   // useEffect(() => {
@@ -70,11 +70,18 @@ const UserCreateTrip = ({navigation}) => {
     if (userCreateTripResponse != null) {
       if (userCreateTripResponse?.error == false) {
         Toast.show({
-          type: 'custom',
+          type: "custom",
           text1: userCreateTripResponse?.message,
-        })
-        navigation.goBack()
-        console.log('userCreateTripResponse', userCreateTripResponse);
+        });
+        setDestination(''),
+          setStartDate(''),
+          setEndDate(''),
+          setNumberOfGuest(''),
+          setActivities(''),
+          setSelectSpatialCare(''),
+          setWriteNotes(''),
+          navigation.goBack();
+        console.log("userCreateTripResponse", userCreateTripResponse);
         dispatch(UserCreateTripReducer.removeUserCreateTripResponse());
       }
     }
@@ -82,9 +89,9 @@ const UserCreateTrip = ({navigation}) => {
 
   useEffect(() => {
     if (userCreateTripErrorResponse != null) {
-      if (userCreateTripErrorResponse?.error != '') {
+      if (userCreateTripErrorResponse?.error != "") {
         Toast.show({
-          type: 'custom',
+          type: "custom",
           text1: userCreateTripErrorResponse?.message,
         });
       }
@@ -93,7 +100,7 @@ const UserCreateTrip = ({navigation}) => {
 
   //function call
 
-  const addSelectActivity = val => {
+  const addSelectActivity = (val) => {
     var tempArray = [...activities];
     var newIndex = tempArray.indexOf(val);
     if (newIndex !== -1) {
@@ -105,7 +112,7 @@ const UserCreateTrip = ({navigation}) => {
     setActivities(tempArray);
   };
 
-  const addSpatialCare = val => {
+  const addSpatialCare = (val) => {
     var tempArray = [...selectSpatialCare];
     var newIndex = tempArray.indexOf(val);
     if (newIndex !== -1) {
@@ -128,42 +135,42 @@ const UserCreateTrip = ({navigation}) => {
 
   const today = new Date();
 
-  const handleConfirm = date => {
-    console.warn('A date has been picked: ', date);
+  const handleConfirm = (date) => {
+    console.warn("A date has been picked: ", date);
     setShowStartDate(false);
     setTimeout(() => {
-      setStartDate(moment(date).format('YYYY-MM-DD'));
+      setStartDate(moment(date).format("YYYY-MM-DD"));
     }, 100);
   };
 
-  const handleEndDateConfirm = date => {
-    console.warn('A date has been picked: ', date);
+  const handleEndDateConfirm = (date) => {
+    console.warn("A date has been picked: ", date);
     setShowEndDate(false);
     setTimeout(() => {
-      setEndDate(moment(date).format('YYYY-MM-DD'));
+      setEndDate(moment(date).format("YYYY-MM-DD"));
     }, 100);
   };
   const addInput = () => {
-    setDestination([...destination, {id: inputCount + 1, value: ''}]);
+    setDestination([...destination, { id: inputCount + 1, value: "" }]);
     setInputCount(inputCount + 1);
   };
 
   const handleInputChange = (text, id) => {
-    const newInputs = destination.map(input => {
+    const newInputs = destination.map((input) => {
       if (input.id === id) {
-        return {...input, value: text};
+        return { ...input, value: text };
       }
       return input;
     });
     setDestination(newInputs);
   };
 
- const  handleStartDateCancel = () => {
-  setShowStartDate(false)
- }
- const  handleEndDateCancel = () => {
-  setShowEndDate(false)
- }
+  const handleStartDateCancel = () => {
+    setShowStartDate(false);
+  };
+  const handleEndDateCancel = () => {
+    setShowEndDate(false);
+  };
 
   const startDatePickerModal = () => {
     return (
@@ -201,7 +208,7 @@ const UserCreateTrip = ({navigation}) => {
       needs: selectSpatialCare,
       notes: writeNotes,
     };
-    dispatch({type: SagaActions.USER_CREATE_TRIP, payload});
+    dispatch({ type: SagaActions.USER_CREATE_TRIP, payload });
   };
 
   return (
@@ -209,45 +216,50 @@ const UserCreateTrip = ({navigation}) => {
       style={{
         flex: 1,
         backgroundColor: config.colors.white,
-      }}>
+      }}
+    >
       <StatusBar
-        barStyle={'dark-content'}
+        barStyle={"dark-content"}
         backgroundColor={config.colors.white}
       />
       <ScrollView
         contentContainerStyle={{
           paddingHorizontal: 20,
         }}
-        showsVerticalScrollIndicator={false}>
+        showsVerticalScrollIndicator={false}
+      >
         <Text
           style={{
             fontFamily: config.fonts.SemiboldFont,
             fontSize: 22,
             marginTop: 15,
-            textAlign: 'center',
+            textAlign: "center",
             lineHeight: 28,
             color: config.colors.blackColor,
-          }}>{`Welcome, ${userGetProfileResponse?.results?.user?.fullName}`}</Text>
+          }}
+        >{`Welcome, ${userGetProfileResponse?.results?.user?.fullName}`}</Text>
         <Text
           style={{
             marginTop: 8,
             fontFamily: config.fonts.MediumFont,
             fontSize: 14,
-            textAlign: 'center',
+            textAlign: "center",
             lineHeight: 21,
             color: config.colors.lightGrey2Color,
-          }}>{`Enter your details below to create your trip`}</Text>
+          }}
+        >{`Enter your details below to create your trip`}</Text>
 
         <View
           style={{
             marginTop: 20,
-          }}>
+          }}
+        >
           <AppTextInput
             placeholder="No. of Guests"
             keyboardType="numeric"
-            onChangeText={val => setNumberOfGuest(val.replace(/[^0-9]/g, ''))}
+            onChangeText={(val) => setNumberOfGuest(val.replace(/[^0-9]/g, ""))}
             value={numberOfGuest}
-            leftIconStyle={{height: 20, width: 20, resizeMode: 'contain'}}
+            leftIconStyle={{ height: 20, width: 20, resizeMode: "contain" }}
             leftIcon={config.images.USER_ICON}
           />
         </View>
@@ -273,13 +285,14 @@ const UserCreateTrip = ({navigation}) => {
             style={{
               marginTop: 12,
             }}
-            key={index}>
+            key={index}
+          >
             <AppTextInput
               placeholder="Enter Destination"
-              keyboardType={'default'}
-              onChangeText={text => handleInputChange(text, input.id)}
+              keyboardType={"default"}
+              onChangeText={(text) => handleInputChange(text, input.id)}
               value={input?.value}
-              leftIconStyle={{height: 20, width: 20, resizeMode: 'contain'}}
+              leftIconStyle={{ height: 20, width: 20, resizeMode: "contain" }}
               leftIcon={config.images.LOCATION1}
             />
             {/* <TextInput
@@ -294,29 +307,31 @@ const UserCreateTrip = ({navigation}) => {
 
         <View
           style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            width: '100%',
-          }}>
+            flexDirection: "row",
+            justifyContent: "space-between",
+            width: "100%",
+          }}
+        >
           <View
             style={{
               height: 50,
               marginTop: 15,
               borderRadius: 12,
-              flexDirection: 'row',
+              flexDirection: "row",
               // justifyContent:',
-              alignItems: 'center',
-              width: '45%',
+              alignItems: "center",
+              width: "45%",
               borderWidth: 1,
               borderColor: config.colors.lightGreyColor,
-            }}>
+            }}
+          >
             <Image
               source={config.images.CALENDAR_ICON}
               style={{
                 height: 16,
                 width: 16,
                 tintColor: config.colors.lightGrey2Color,
-                resizeMode: 'contain',
+                resizeMode: "contain",
                 marginHorizontal: 20,
               }}
             />
@@ -327,8 +342,9 @@ const UserCreateTrip = ({navigation}) => {
                 lineHeight: 16,
                 color: config.colors.lightGrey2Color,
               }}
-              onPress={() => setShowStartDate(true)}>
-              {startDate != '' ? startDate : `Start Date`}
+              onPress={() => setShowStartDate(true)}
+            >
+              {startDate != "" ? startDate : `Start Date`}
             </Text>
           </View>
           <View
@@ -336,20 +352,21 @@ const UserCreateTrip = ({navigation}) => {
               height: 50,
               marginTop: 15,
               borderRadius: 12,
-              flexDirection: 'row',
+              flexDirection: "row",
               // justifyContent:',
-              alignItems: 'center',
-              width: '45%',
+              alignItems: "center",
+              width: "45%",
               borderWidth: 1,
               borderColor: config.colors.lightGreyColor,
-            }}>
+            }}
+          >
             <Image
               source={config.images.CALENDAR_ICON}
               style={{
                 height: 16,
                 width: 16,
                 tintColor: config.colors.lightGrey2Color,
-                resizeMode: 'contain',
+                resizeMode: "contain",
                 marginHorizontal: 20,
               }}
             />
@@ -360,19 +377,21 @@ const UserCreateTrip = ({navigation}) => {
                 lineHeight: 16,
                 color: config.colors.lightGrey2Color,
               }}
-              onPress={() => setShowEndDate(true)}>
-              {endDate != '' ? endDate : `End Date`}
+              onPress={() => setShowEndDate(true)}
+            >
+              {endDate != "" ? endDate : `End Date`}
             </Text>
           </View>
         </View>
 
         <AppButton
-          text={'Add Another Destination'}
+          text={"Add Another Destination"}
           onPress={() => {
-            if(destination?.[(destination.length) -1]?.value != ''){
-              addInput()}
-            }}
-          buttonStyle={{marginVertical: 20}}
+            if (destination?.[destination.length - 1]?.value != "") {
+              addInput();
+            }
+          }}
+          buttonStyle={{ marginVertical: 20 }}
         />
 
         <View
@@ -387,12 +406,13 @@ const UserCreateTrip = ({navigation}) => {
             borderColor: config.colors.lightGreyColor,
             borderWidth: 1,
             borderRadius: 12,
-          }}>
+          }}
+        >
           <TextInput
             multiline={true}
             placeholder="Add note for local.."
             placeholderTextColor={config.colors.lightGrey2Color}
-            onChangeText={val => setWriteNotes(val)}
+            onChangeText={(val) => setWriteNotes(val)}
             value={writeNotes}
           />
         </View>
@@ -423,21 +443,23 @@ const UserCreateTrip = ({navigation}) => {
             fontSize: 15,
             lineHeight: 18,
             color: config.colors.blackColor,
-          }}>{`What to do in your trip?`}</Text>
+          }}
+        >{`What to do in your trip?`}</Text>
 
         <View
           style={{
-            flexDirection: 'row',
-            flexWrap: 'wrap',
+            flexDirection: "row",
+            flexWrap: "wrap",
             // marginTop: 15,
-          }}>
+          }}
+        >
           <TouchableOpacity
             style={{
               marginVertical: 8,
-              flexDirection: 'row',
+              flexDirection: "row",
               marginRight: 8,
-              justifyContent: 'space-between',
-              alignItems: 'center',
+              justifyContent: "space-between",
+              alignItems: "center",
               paddingHorizontal: 12,
               paddingVertical: 7,
               borderRadius: 18,
@@ -449,50 +471,52 @@ const UserCreateTrip = ({navigation}) => {
                   : config.colors.white,
             }}
             onPress={() => {
-              handleSelectAll()
-            }}>
+              handleSelectAll();
+            }}
+          >
             <Text
               style={{
                 fontSize: 12,
                 fontFamily: config.fonts.SemiboldFont,
                 lineHeight: 14,
-                color:
-                  isAllSelected
-                    ? config.colors.white
-                    : config.colors.yellowColor,
-              }}>{`All`}</Text>
+                color: isAllSelected
+                  ? config.colors.white
+                  : config.colors.yellowColor,
+              }}
+            >{`All`}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={{
               marginRight: 8,
               marginVertical: 8,
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              alignItems: 'center',
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center",
               paddingHorizontal: 12,
               paddingVertical: 7,
               borderRadius: 18,
               borderWidth: 1,
               borderColor: config.colors.yellowColor,
-              backgroundColor: activities.includes('Camping')
+              backgroundColor: activities.includes("Camping")
                 ? config.colors.yellowColor
                 : config.colors.white,
             }}
             onPress={() => {
-              setSelectActivity('Camping');
-              addSelectActivity('Camping');
-            }}>
+              setSelectActivity("Camping");
+              addSelectActivity("Camping");
+            }}
+          >
             <Image
               source={config.images.CAMPING_ICON}
               style={{
                 height: 20,
                 width: 20,
                 marginRight: 5,
-                tintColor: activities?.includes('Camping')
+                tintColor: activities?.includes("Camping")
                   ? config.colors.white
                   : config.colors.yellowColor,
-                resizeMode: 'contain',
+                resizeMode: "contain",
               }}
             />
             <Text
@@ -500,41 +524,43 @@ const UserCreateTrip = ({navigation}) => {
                 fontSize: 12,
                 fontFamily: config.fonts.SemiboldFont,
                 lineHeight: 14,
-                color: activities?.includes('Camping')
+                color: activities?.includes("Camping")
                   ? config.colors.white
                   : config.colors.yellowColor,
-              }}>{`Camping`}</Text>
+              }}
+            >{`Camping`}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={{
-              flexDirection: 'row',
+              flexDirection: "row",
               marginVertical: 8,
               marginRight: 8,
-              justifyContent: 'space-between',
-              alignItems: 'center',
+              justifyContent: "space-between",
+              alignItems: "center",
               paddingHorizontal: 12,
               paddingVertical: 7,
               borderRadius: 18,
               borderWidth: 1,
               borderColor: config.colors.yellowColor,
-              backgroundColor: activities?.includes('Wildlife Viewing')
+              backgroundColor: activities?.includes("Wildlife Viewing")
                 ? config.colors.yellowColor
                 : config.colors.white,
             }}
             onPress={() => {
-              addSelectActivity('Wildlife Viewing');
-            }}>
+              addSelectActivity("Wildlife Viewing");
+            }}
+          >
             <Image
               source={config.images.WILDLIFE_ICON}
               style={{
                 height: 20,
                 width: 20,
                 marginRight: 5,
-                tintColor: activities?.includes('Wildlife Viewing')
+                tintColor: activities?.includes("Wildlife Viewing")
                   ? config.colors.white
                   : config.colors.yellowColor,
-                resizeMode: 'contain',
+                resizeMode: "contain",
               }}
             />
             <Text
@@ -542,41 +568,43 @@ const UserCreateTrip = ({navigation}) => {
                 fontSize: 12,
                 fontFamily: config.fonts.SemiboldFont,
                 lineHeight: 14,
-                color: activities?.includes('Wildlife Viewing')
+                color: activities?.includes("Wildlife Viewing")
                   ? config.colors.white
                   : config.colors.yellowColor,
-              }}>{`Wildlife Viewing`}</Text>
+              }}
+            >{`Wildlife Viewing`}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={{
-              flexDirection: 'row',
+              flexDirection: "row",
               marginRight: 8,
               marginVertical: 8,
-              justifyContent: 'space-between',
-              alignItems: 'center',
+              justifyContent: "space-between",
+              alignItems: "center",
               paddingHorizontal: 12,
               paddingVertical: 7,
               borderRadius: 18,
               borderWidth: 1,
               borderColor: config.colors.yellowColor,
-              backgroundColor: activities?.includes('Bonfire')
+              backgroundColor: activities?.includes("Bonfire")
                 ? config.colors.yellowColor
                 : config.colors.white,
             }}
             onPress={() => {
-              addSelectActivity('Bonfire');
-            }}>
+              addSelectActivity("Bonfire");
+            }}
+          >
             <Image
               source={config.images.BONFIRE_ICON}
               style={{
                 height: 20,
                 width: 20,
                 marginRight: 5,
-                tintColor: activities?.includes('Bonfire')
+                tintColor: activities?.includes("Bonfire")
                   ? config.colors.white
                   : config.colors.yellowColor,
-                resizeMode: 'contain',
+                resizeMode: "contain",
               }}
             />
             <Text
@@ -584,41 +612,43 @@ const UserCreateTrip = ({navigation}) => {
                 fontSize: 12,
                 fontFamily: config.fonts.SemiboldFont,
                 lineHeight: 14,
-                color: activities?.includes('Bonfire')
+                color: activities?.includes("Bonfire")
                   ? config.colors.white
                   : config.colors.yellowColor,
-              }}>{`Bonfire`}</Text>
+              }}
+            >{`Bonfire`}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={{
-              flexDirection: 'row',
+              flexDirection: "row",
               marginRight: 8,
               marginVertical: 8,
-              justifyContent: 'space-between',
-              alignItems: 'center',
+              justifyContent: "space-between",
+              alignItems: "center",
               paddingHorizontal: 12,
               paddingVertical: 7,
               borderRadius: 18,
               borderWidth: 1,
               borderColor: config.colors.yellowColor,
-              backgroundColor: activities?.includes('Boat Tourink')
+              backgroundColor: activities?.includes("Boat Tourink")
                 ? config.colors.yellowColor
                 : config.colors.white,
             }}
             onPress={() => {
-              addSelectActivity('Boat Tourink');
-            }}>
+              addSelectActivity("Boat Tourink");
+            }}
+          >
             <Image
               source={config.images.BOATING_ICON}
               style={{
                 height: 20,
                 width: 20,
                 marginRight: 5,
-                tintColor: activities?.includes('Boat Tourink')
+                tintColor: activities?.includes("Boat Tourink")
                   ? config.colors.white
                   : config.colors.yellowColor,
-                resizeMode: 'contain',
+                resizeMode: "contain",
               }}
             />
             <Text
@@ -626,41 +656,43 @@ const UserCreateTrip = ({navigation}) => {
                 fontSize: 12,
                 fontFamily: config.fonts.SemiboldFont,
                 lineHeight: 14,
-                color: activities?.includes('Boat Tourink')
+                color: activities?.includes("Boat Tourink")
                   ? config.colors.white
                   : config.colors.yellowColor,
-              }}>{`Boat Tourink`}</Text>
+              }}
+            >{`Boat Tourink`}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={{
-              flexDirection: 'row',
+              flexDirection: "row",
               marginRight: 8,
               marginVertical: 8,
-              justifyContent: 'space-between',
-              alignItems: 'center',
+              justifyContent: "space-between",
+              alignItems: "center",
               paddingHorizontal: 12,
               paddingVertical: 7,
               borderRadius: 18,
               borderWidth: 1,
               borderColor: config.colors.yellowColor,
-              backgroundColor: activities?.includes('Hiking')
+              backgroundColor: activities?.includes("Hiking")
                 ? config.colors.yellowColor
                 : config.colors.white,
             }}
             onPress={() => {
-              addSelectActivity('Hiking');
-            }}>
+              addSelectActivity("Hiking");
+            }}
+          >
             <Image
               source={config.images.HIKING_ICON}
               style={{
                 height: 20,
                 width: 20,
                 marginRight: 5,
-                tintColor: activities?.includes('Hiking')
+                tintColor: activities?.includes("Hiking")
                   ? config.colors.white
                   : config.colors.yellowColor,
-                resizeMode: 'contain',
+                resizeMode: "contain",
               }}
             />
             <Text
@@ -668,10 +700,11 @@ const UserCreateTrip = ({navigation}) => {
                 fontSize: 12,
                 fontFamily: config.fonts.SemiboldFont,
                 lineHeight: 14,
-                color: activities?.includes('Hiking')
+                color: activities?.includes("Hiking")
                   ? config.colors.white
                   : config.colors.yellowColor,
-              }}>{`Hiking`}</Text>
+              }}
+            >{`Hiking`}</Text>
           </TouchableOpacity>
         </View>
 
@@ -682,43 +715,46 @@ const UserCreateTrip = ({navigation}) => {
             fontSize: 15,
             lineHeight: 18,
             color: config.colors.blackColor,
-          }}>{`Do you need special care?`}</Text>
+          }}
+        >{`Do you need special care?`}</Text>
 
         <View
           style={{
-            flexDirection: 'row',
-            flexWrap: 'wrap',
+            flexDirection: "row",
+            flexWrap: "wrap",
             // marginTop: 15,
-          }}>
+          }}
+        >
           <TouchableOpacity
             style={{
               marginRight: 8,
               marginVertical: 8,
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              alignItems: 'center',
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center",
               paddingHorizontal: 12,
               paddingVertical: 7,
               borderRadius: 18,
               borderWidth: 1,
               borderColor: config.colors.yellowColor,
-              backgroundColor: selectSpatialCare?.includes('Wheelchair')
+              backgroundColor: selectSpatialCare?.includes("Wheelchair")
                 ? config.colors.yellowColor
                 : config.colors.white,
             }}
             onPress={() => {
-              addSpatialCare('Wheelchair');
-            }}>
+              addSpatialCare("Wheelchair");
+            }}
+          >
             <Image
               source={config.images.WHEELCHAIR_ICON}
               style={{
                 height: 20,
                 width: 20,
                 marginRight: 5,
-                tintColor: selectSpatialCare?.includes('Wheelchair')
+                tintColor: selectSpatialCare?.includes("Wheelchair")
                   ? config.colors.white
                   : config.colors.yellowColor,
-                resizeMode: 'contain',
+                resizeMode: "contain",
               }}
             />
             <Text
@@ -726,41 +762,43 @@ const UserCreateTrip = ({navigation}) => {
                 fontSize: 12,
                 fontFamily: config.fonts.SemiboldFont,
                 lineHeight: 14,
-                color: selectSpatialCare?.includes('Wheelchair')
+                color: selectSpatialCare?.includes("Wheelchair")
                   ? config.colors.white
                   : config.colors.yellowColor,
-              }}>{`Wheelchair`}</Text>
+              }}
+            >{`Wheelchair`}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={{
-              flexDirection: 'row',
+              flexDirection: "row",
               marginVertical: 8,
               marginRight: 8,
-              justifyContent: 'space-between',
-              alignItems: 'center',
+              justifyContent: "space-between",
+              alignItems: "center",
               paddingHorizontal: 12,
               paddingVertical: 7,
               borderRadius: 18,
               borderWidth: 1,
               borderColor: config.colors.yellowColor,
-              backgroundColor: selectSpatialCare?.includes('Blind')
+              backgroundColor: selectSpatialCare?.includes("Blind")
                 ? config.colors.yellowColor
                 : config.colors.white,
             }}
             onPress={() => {
-              addSpatialCare('Blind');
-            }}>
+              addSpatialCare("Blind");
+            }}
+          >
             <Image
               source={config.images.CLOSE_EYE_ICON}
               style={{
                 height: 20,
                 width: 20,
                 marginRight: 5,
-                tintColor: selectSpatialCare?.includes('Blind')
+                tintColor: selectSpatialCare?.includes("Blind")
                   ? config.colors.white
                   : config.colors.yellowColor,
-                resizeMode: 'contain',
+                resizeMode: "contain",
               }}
             />
             <Text
@@ -768,41 +806,43 @@ const UserCreateTrip = ({navigation}) => {
                 fontSize: 12,
                 fontFamily: config.fonts.SemiboldFont,
                 lineHeight: 14,
-                color: selectSpatialCare?.includes('Blind')
+                color: selectSpatialCare?.includes("Blind")
                   ? config.colors.white
                   : config.colors.yellowColor,
-              }}>{`Blind`}</Text>
+              }}
+            >{`Blind`}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={{
-              flexDirection: 'row',
+              flexDirection: "row",
               marginRight: 8,
               marginVertical: 8,
-              justifyContent: 'space-between',
-              alignItems: 'center',
+              justifyContent: "space-between",
+              alignItems: "center",
               paddingHorizontal: 12,
               paddingVertical: 7,
               borderRadius: 18,
               borderWidth: 1,
               borderColor: config.colors.yellowColor,
-              backgroundColor: selectSpatialCare?.includes('Any Injuries')
+              backgroundColor: selectSpatialCare?.includes("Any Injuries")
                 ? config.colors.yellowColor
                 : config.colors.white,
             }}
             onPress={() => {
-              addSpatialCare('Any Injuries');
-            }}>
+              addSpatialCare("Any Injuries");
+            }}
+          >
             <Image
               source={config.images.BANDAIDS_ICON}
               style={{
                 height: 20,
                 width: 20,
                 marginRight: 5,
-                tintColor: selectSpatialCare?.includes('Any Injuries')
+                tintColor: selectSpatialCare?.includes("Any Injuries")
                   ? config.colors.white
                   : config.colors.yellowColor,
-                resizeMode: 'contain',
+                resizeMode: "contain",
               }}
             />
             <Text
@@ -810,41 +850,43 @@ const UserCreateTrip = ({navigation}) => {
                 fontSize: 12,
                 fontFamily: config.fonts.SemiboldFont,
                 lineHeight: 14,
-                color: selectSpatialCare?.includes('Any Injuries')
+                color: selectSpatialCare?.includes("Any Injuries")
                   ? config.colors.white
                   : config.colors.yellowColor,
-              }}>{`Any Injuries`}</Text>
+              }}
+            >{`Any Injuries`}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={{
-              flexDirection: 'row',
+              flexDirection: "row",
               marginRight: 8,
               marginVertical: 8,
-              justifyContent: 'space-between',
-              alignItems: 'center',
+              justifyContent: "space-between",
+              alignItems: "center",
               paddingHorizontal: 12,
               paddingVertical: 7,
               borderRadius: 18,
               borderWidth: 1,
               borderColor: config.colors.yellowColor,
-              backgroundColor: selectSpatialCare?.includes('Deaf')
+              backgroundColor: selectSpatialCare?.includes("Deaf")
                 ? config.colors.yellowColor
                 : config.colors.white,
             }}
             onPress={() => {
-              addSpatialCare('Deaf');
-            }}>
+              addSpatialCare("Deaf");
+            }}
+          >
             <Image
               source={config.images.CLOSE_EAR_ICON}
               style={{
                 height: 20,
                 width: 20,
                 marginRight: 5,
-                tintColor: selectSpatialCare?.includes('Deaf')
+                tintColor: selectSpatialCare?.includes("Deaf")
                   ? config.colors.white
                   : config.colors.yellowColor,
-                resizeMode: 'contain',
+                resizeMode: "contain",
               }}
             />
             <Text
@@ -852,30 +894,33 @@ const UserCreateTrip = ({navigation}) => {
                 fontSize: 12,
                 fontFamily: config.fonts.SemiboldFont,
                 lineHeight: 14,
-                color: selectSpatialCare?.includes('Deaf')
+                color: selectSpatialCare?.includes("Deaf")
                   ? config.colors.white
                   : config.colors.yellowColor,
-              }}>{`Deaf`}</Text>
+              }}
+            >{`Deaf`}</Text>
           </TouchableOpacity>
         </View>
 
         <View
           style={{
             marginTop: 20,
-            width: '100%',
-            alignItems: 'center',
+            width: "100%",
+            alignItems: "center",
             marginVertical: 20,
-            flexDirection: 'row',
-            alignItems: 'center',
+            flexDirection: "row",
+            alignItems: "center",
             // justifyContent:'space-between'
-          }}>
+          }}
+        >
           <TouchableOpacity
             style={{
               height: 23,
               width: 23,
-              resizeMode: 'contain',
+              resizeMode: "contain",
             }}
-            onPress={() => setToggle(!toggle)}>
+            onPress={() => setToggle(!toggle)}
+          >
             <Image
               source={
                 toggle ? config.images.CHECK_ICON : config.images.UNCHECK_ICON
@@ -884,7 +929,7 @@ const UserCreateTrip = ({navigation}) => {
                 marginTop: 2,
                 height: toggle ? 23 : 21,
                 width: toggle ? 23 : 21,
-                resizeMode: 'contain',
+                resizeMode: "contain",
                 marginRight: 6,
               }}
             />
@@ -896,47 +941,51 @@ const UserCreateTrip = ({navigation}) => {
               fontSize: 12,
               lineHeight: 19,
               color: config.colors.lightGrey2Color,
-            }}>
+            }}
+          >
             {`  I Agree to the  `}
           </Text>
 
           <Text
             style={{
-              textDecorationLine: 'underline',
+              textDecorationLine: "underline",
               textDecorationColor: config.colors.primaryColor,
               fontFamily: config.fonts.HeadingFont,
               fontSize: 12,
               lineHeight: 19,
               color: config.colors.primaryColor,
-            }}>
+            }}
+          >
             {`Terms of Service`}
           </Text>
 
           <Text
             style={{
-              textDecorationLine: 'none',
+              textDecorationLine: "none",
               textDecorationColor: config.colors.white,
               fontFamily: config.fonts.PrimaryFont,
               fontSize: 12,
               lineHeight: 19,
               color: config.colors.lightGrey2Color,
-            }}>
+            }}
+          >
             {`  &  `}
           </Text>
 
           <Text
             style={{
-              textDecorationLine: 'underline',
+              textDecorationLine: "underline",
               textDecorationColor: config.colors.primaryColor,
               fontFamily: config.fonts.HeadingFont,
               fontSize: 12,
               lineHeight: 19,
               color: config.colors.primaryColor,
-            }}>{`Privacy Policy`}</Text>
+            }}
+          >{`Privacy Policy`}</Text>
         </View>
 
         <AppButton
-          text={'Submit'}
+          text={"Submit"}
           onPress={() => callUserCreateTripApi()}
           buttonStyle={{
             marginVertical: 20,
@@ -947,23 +996,25 @@ const UserCreateTrip = ({navigation}) => {
           style={{
             marginBottom: 20,
             height: 44,
-            justifyContent: 'center',
-            alignItems: 'center',
+            justifyContent: "center",
+            alignItems: "center",
             borderWidth: 1,
             borderColor: config.colors.yellowColor,
             borderRadius: 12,
           }}
-          onPress={() => navigation.goBack()}>
+          onPress={() => navigation.goBack()}
+        >
           <Text
             style={{
               fontFamily: config.fonts.HeadingFont,
               fontSize: 16,
               lineHeight: 24,
               color: config.colors.yellowColor,
-            }}>{`Later`}</Text>
+            }}
+          >{`Later`}</Text>
         </TouchableOpacity>
-      {startDatePickerModal()}
-      {endDatePickerModal()}
+        {startDatePickerModal()}
+        {endDatePickerModal()}
       </ScrollView>
     </SafeAreaView>
   );

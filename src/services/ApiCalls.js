@@ -84,6 +84,12 @@ export const ApiCalls = ({apiType}) => {
       requestUrl = ApiUrls.GUIDE_PAY_STATUS_URL;
       break;
 
+      case SagaActions.USER_GET_ALL_TRIP_LIST:
+        requestType = 'PUT';
+        requestUrl = ApiUrls.USER_GET_ALL_TRIP_LIST_URL;
+        break;
+  
+
     /*  GET request */
     case SagaActions.GUIDE_GET_PROFILE:
       requestType = 'GET';
@@ -100,11 +106,7 @@ export const ApiCalls = ({apiType}) => {
       requestUrl = ApiUrls.USER_TRIP_MEMORIES_COUNT_URL;
       break;
 
-    case SagaActions.USER_GET_ALL_TRIP_LIST:
-      requestType = 'GET';
-      requestUrl = ApiUrls.USER_GET_ALL_TRIP_LIST_URL;
-      break;
-
+   
     case SagaActions.USER_GET_LOCAL_TRIP_MEMORIES:
       requestType = 'GET';
       requestUrl = ApiUrls.USER_GET_LOCAL_TRIP_MEMORIES_URL;

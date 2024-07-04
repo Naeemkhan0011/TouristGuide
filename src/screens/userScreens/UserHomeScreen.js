@@ -1,7 +1,9 @@
 import {
+  Animated,
   Image,
   Modal,
   Platform,
+  Pressable,
   SafeAreaView,
   ScrollView,
   StatusBar,
@@ -11,55 +13,58 @@ import {
   TextInput,
   TouchableOpacity,
   View,
-} from 'react-native';
-import React, {useCallback, useEffect, useState} from 'react';
-import config from '../../config';
-import {useDispatch, useSelector} from 'react-redux';
+} from "react-native";
+import React, { useCallback, useEffect, useState } from "react";
+import config from "../../config";
+import LinearGradient from 'react-native-linear-gradient';
+import { useDispatch, useSelector } from "react-redux";
 import {
   UserFilterApiReducer,
   UserGetProfileReducer,
   UserHomeScreenReducer,
   UserOffRoadTripReducer,
   UserRoadTripReducer,
-} from '../../redux/reducers';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import {useFocusEffect} from '@react-navigation/native';
-import {SagaActions} from '../../redux/sagas/SagaActions';
-import Slider from '@react-native-community/slider';
-import {debounce} from 'lodash';
-import Toast from 'react-native-toast-message';
+} from "../../redux/reducers";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useFocusEffect } from "@react-navigation/native";
+import { SagaActions } from "../../redux/sagas/SagaActions";
+import Slider from "@react-native-community/slider";
+import { debounce } from "lodash";
+import Toast from "react-native-toast-message";
 
 const UserHomeScreen = () => {
   const dispatch = useDispatch();
+  const [isEnabled, setEnabled] = useState(false);
+  const [animatedValue] = useState(new Animated.Value(isEnabled ? 1 : 0));
   const userFilterApiResponse = useSelector(
-    UserFilterApiReducer.selectUserFilterApiData,
+    UserFilterApiReducer.selectUserFilterApiData
   );
   const userFilterApiErrorResponse = useSelector(
-    UserFilterApiReducer.selectUserFilterApiResponse,
+    UserFilterApiReducer.selectUserFilterApiResponse
   );
   const userHomeScreenResponse = useSelector(
-    UserHomeScreenReducer.selectUserHomeScreenData,
+    UserHomeScreenReducer.selectUserHomeScreenData
   );
   const userRoadTripResponse = useSelector(
-    UserRoadTripReducer.selectUserRoadTripData,
+    UserRoadTripReducer.selectUserRoadTripData
   );
   const userOffRoadTripResponse = useSelector(
-    UserOffRoadTripReducer.selectUserOffRoadTripData,
+    UserOffRoadTripReducer.selectUserOffRoadTripData
   );
   const userGetProfileResponse = useSelector(
-    UserGetProfileReducer.selectUserGetProfileData,
+    UserGetProfileReducer.selectUserGetProfileData
   );
   const userGetProfileErrorResponse = useSelector(
-    UserGetProfileReducer.selectUserGetProfileResponse,
+    UserGetProfileReducer.selectUserGetProfileResponse
   );
-  const [search, setSearch] = useState('');
-  const [trip, setTrip] = useState('Popular Cities');
-  const [userId, setUserId] = useState('');
+  const [search, setSearch] = useState("");
+  const [trip, setTrip] = useState("Popular Cities");
+  const [userId, setUserId] = useState("");
   const [sliderValue, setSliderValue] = useState(55);
   const [filterModalVisible, setFilterModalVisible] = useState(false);
-  const [gender, setGender] = useState('Male');
-  const [selectActivity, setSelectActivity] = useState('All');
-  const [selectSpatialCare, setSelectSpatialCare] = useState('');
+  const [gender, setGender] = useState("Male");
+  const [selectActivity, setSelectActivity] = useState("All");
+  const [selectSpatialCare, setSelectSpatialCare] = useState("");
   const [renderSwitch, setRenderSwitch] = useState(true);
 
   // hooks call
@@ -68,16 +73,16 @@ const UserHomeScreen = () => {
     if (userFilterApiResponse != null) {
       if (userFilterApiResponse?.error == false) {
         setFilterModalVisible(false);
-        console.log('userFilterApiResponse', userFilterApiResponse);
+        console.log("userFilterApiResponse", userFilterApiResponse);
       }
     }
   }, [userFilterApiResponse]);
 
   useEffect(() => {
     if (userFilterApiErrorResponse != null) {
-      if (userFilterApiErrorResponse?.error != '') {
+      if (userFilterApiErrorResponse?.error != "") {
         Toast.show({
-          type: 'custom',
+          type: "custom",
           text1: userFilterApiErrorResponse?.message,
         });
         dispatch(UserFilterApiReducer.removeUserFilterApiResponse());
@@ -88,7 +93,7 @@ const UserHomeScreen = () => {
   useEffect(() => {
     if (userHomeScreenResponse != null) {
       if (userHomeScreenResponse?.error == false) {
-        console.log('userHomeScreenResponse', userHomeScreenResponse);
+        console.log("userHomeScreenResponse", userHomeScreenResponse);
       }
     }
   }, [userHomeScreenResponse]);
@@ -96,7 +101,7 @@ const UserHomeScreen = () => {
   useEffect(() => {
     if (userRoadTripResponse != null) {
       if (userRoadTripResponse?.error == false) {
-        console.log('userRoadTripResponse', userRoadTripResponse);
+        console.log("userRoadTripResponse", userRoadTripResponse);
       }
     }
   }, [userRoadTripResponse]);
@@ -104,7 +109,7 @@ const UserHomeScreen = () => {
   useEffect(() => {
     if (userOffRoadTripResponse != null) {
       if (userOffRoadTripResponse?.error == false) {
-        console.log('userOffRoadTripResponse', userOffRoadTripResponse);
+        console.log("userOffRoadTripResponse", userOffRoadTripResponse);
       }
     }
   }, [userOffRoadTripResponse]);
@@ -114,66 +119,93 @@ const UserHomeScreen = () => {
       if (userGetProfileResponse?.error == false) {
         callUserHomeScreenApi(userGetProfileResponse?.results?.user?._id);
         setUserId(userGetProfileResponse?.results?.user?._id);
-        console.log('userGetProfileResponse', userGetProfileResponse);
+        console.log("userGetProfileResponse", userGetProfileResponse);
       }
     }
   }, [userGetProfileResponse]);
 
   useEffect(() => {
     if (userGetProfileErrorResponse != null) {
-      if (userGetProfileErrorResponse?.error != '') {
+      if (userGetProfileErrorResponse?.error != "") {
         Toast.show({
-          type: 'custom',
+          type: "custom",
           text1: userGetProfileErrorResponse?.message,
         });
       }
     }
   }, [userGetProfileErrorResponse]);
 
+  useEffect(() => {
+		// Update the animated value when the value prop changes
+		Animated.timing(animatedValue, {
+			toValue: isEnabled ? 1 : 0,
+			duration: 300, // Adjust the animation duration
+			useNativeDriver: false,
+		}).start();
+	}, [isEnabled]);
+
+	const translateX = animatedValue.interpolate({
+		inputRange: [0, 1],
+		outputRange: [4, 28], // Adjust the distance of the switch head
+	});
+
+	const toggleSwitch = () => {
+		setEnabled(!isEnabled);
+	};
+
   useFocusEffect(
     useCallback(() => {
       callGetUserApi();
       callRoadTripApi();
       callOffRoadTripApi();
-    }, []),
+    }, [])
   );
 
   // function call
+
+  const defaultStyles = {
+    bgGradientColors: [config.colors.yellowColor, config.colors.yellowColor],
+    headGradientColors: [config.colors.white, config.colors.white],
+  };
+  
+  const activeStyles = {
+    bgGradientColors: [config.colors.yellowColor, config.colors.yellowColor],
+    headGradientColors: [config.colors.greyColor, config.colors.greyColor],
+  };
+
   const debouncedFetchSuggestions = useCallback(
-    debounce(async query => {
+    debounce(async (query) => {
       if (query) {
-       const result = await callUserHomeScreenApi(query)
-       const result1 = await callRoadTripApi(query)
-       const result2 = await callOffRoadTripApi(query)
-       console.log('result,result1,result2',result,result1,result2);
-        // const results = await callListenerListApi(query);
-        // setSuggestions(results);
+        const result = await callUserHomeScreenApi(query);
+        const result1 = await callRoadTripApi(query);
+        const result2 = await callOffRoadTripApi(query);
+        console.log("result,result1,result2", result, result1, result2);
       }
     }, 300),
-    [],
+    []
   );
 
   // api call
 
   const callUserFilterApi = () => {
-    if (gender == '') {
+    if (gender == "") {
       return Toast.show({
-        type: 'custom',
-        text1: 'Please Select Gender',
+        type: "custom",
+        text1: "Please Select Gender",
       });
     }
 
-    if (selectActivity == '') {
+    if (selectActivity == "") {
       return Toast.show({
-        type: 'custom',
-        text1: 'Please Select Activity',
+        type: "custom",
+        text1: "Please Select Activity",
       });
     }
 
-    if (selectSpatialCare == '') {
+    if (selectSpatialCare == "") {
       return Toast.show({
-        type: 'custom',
-        text1: 'Please Select SpatialCare',
+        type: "custom",
+        text1: "Please Select SpatialCare",
       });
     }
 
@@ -191,32 +223,32 @@ const UserHomeScreen = () => {
       //  minPrice:0,
       //  maxprice:99
     };
-    dispatch({type: SagaActions.USER_FILTER_API, payload});
+    dispatch({ type: SagaActions.USER_FILTER_API, payload });
   };
 
   const callGetUserApi = () => {
-    dispatch({type: SagaActions.USER_GET_PROFILE, payload: ''});
+    dispatch({ type: SagaActions.USER_GET_PROFILE, payload: "" });
   };
 
   const callUserHomeScreenApi = () => {
     const payload = {
-      search : ''
-    }
-    dispatch({type: SagaActions.USER_HOME_SCREEN, payload});
+      search: "",
+    };
+    dispatch({ type: SagaActions.USER_HOME_SCREEN, payload });
   };
 
   const callRoadTripApi = (val) => {
     const payload = {
-      search : val
-    }
-    dispatch({type: SagaActions.USER_ROAD_TRIP, payload});
+      search: val,
+    };
+    dispatch({ type: SagaActions.USER_ROAD_TRIP, payload });
   };
 
   const callOffRoadTripApi = (val) => {
     const payload = {
-      search : val
-    }
-    dispatch({type: SagaActions.USER_OFF_ROAD_TRIP, payload});
+      search: val,
+    };
+    dispatch({ type: SagaActions.USER_OFF_ROAD_TRIP, payload });
   };
 
   const popularCity = () => {
@@ -225,31 +257,34 @@ const UserHomeScreen = () => {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
           marginHorizontal: 20,
-        }}>
+        }}
+      >
         {userHomeScreenResponse?.results?.popularCities?.map((item, index) => {
           return (
             <View
               style={{
                 marginTop: 20,
               }}
-              key={index}>
+              key={index}
+            >
               <Image
-                source={{uri: item?.image}}
+                source={{ uri: item?.image }}
                 style={{
                   borderRadius: 10,
                   height: 231,
-                  width: '100%',
-                  resizeMode: 'cover',
+                  width: "100%",
+                  resizeMode: "cover",
                 }}
               />
               <View
                 style={{
-                  flexDirection: 'row',
+                  flexDirection: "row",
                   marginTop: 15,
-                }}>
+                }}
+              >
                 <Image
                   source={config.images.LOCATION}
-                  style={{height: 20, width: 20, resizeMode: 'contain'}}
+                  style={{ height: 20, width: 20, resizeMode: "contain" }}
                 />
                 <Text
                   style={{
@@ -257,7 +292,8 @@ const UserHomeScreen = () => {
                     fontFamily: config.fonts.HeadingFont,
                     lineHeight: 16,
                     color: config.colors.blackColor,
-                  }}>
+                  }}
+                >
                   {item?.cityName} {item?.countryName}
                 </Text>
               </View>
@@ -267,27 +303,35 @@ const UserHomeScreen = () => {
                   fontSize: 10,
                   lineHeight: 14,
                   color: config.colors.lightGrey2Color,
-                }}>{`Lorem Ipsum is simply dummy text of the printing and typesetting industry. `}</Text>
+                }}
+              >{`Lorem Ipsum is simply dummy text of the printing and typesetting industry. `}</Text>
 
               <View
                 style={{
                   marginTop: 10,
                   height: 45,
                   marginHorizontal: 20,
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                }}>
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                }}
+              >
                 <TouchableOpacity
                   style={{
                     height: 25,
-                    width: '30%',
-                    flexDirection: 'row',
+                    width: "30%",
+                    flexDirection: "row",
                     // justifyContent:'space-between',
-                    alignItems: 'center',
-                  }}>
+                    alignItems: "center",
+                  }}
+                >
                   <Image
                     source={config.images.CAMPING_ICON}
-                    style={{height: 20, width: 20, marginTop:6, resizeMode: 'contain'}}
+                    style={{
+                      height: 20,
+                      width: 20,
+                      marginTop: 6,
+                      resizeMode: "contain",
+                    }}
                   />
                   <Text
                     style={{
@@ -297,18 +341,25 @@ const UserHomeScreen = () => {
                       fontFamily: config.fonts.MediumFont,
                       lineHeight: 14,
                       color: config.colors.blackColor,
-                    }}>{`Camping`}</Text>
+                    }}
+                  >{`Camping`}</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={{
                     height: 25,
-                    flexDirection: 'row',
-                    width: '30%',
-                    alignItems: 'center',
-                  }}>
+                    flexDirection: "row",
+                    width: "30%",
+                    alignItems: "center",
+                  }}
+                >
                   <Image
                     source={config.images.HIKING_ICON}
-                    style={{height: 20, width: 20, marginTop:6,resizeMode: 'contain'}}
+                    style={{
+                      height: 20,
+                      width: 20,
+                      marginTop: 6,
+                      resizeMode: "contain",
+                    }}
                   />
                   <Text
                     style={{
@@ -318,18 +369,25 @@ const UserHomeScreen = () => {
                       fontFamily: config.fonts.MediumFont,
                       lineHeight: 14,
                       color: config.colors.blackColor,
-                    }}>{`Hiking`}</Text>
+                    }}
+                  >{`Hiking`}</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={{
                     height: 25,
-                    width: '30%',
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                  }}>
+                    width: "30%",
+                    flexDirection: "row",
+                    alignItems: "center",
+                  }}
+                >
                   <Image
                     source={config.images.TREKKING_ICON}
-                    style={{height: 20, width: 20, marginTop:6, resizeMode: 'contain'}}
+                    style={{
+                      height: 20,
+                      width: 20,
+                      marginTop: 6,
+                      resizeMode: "contain",
+                    }}
                   />
                   <Text
                     style={{
@@ -339,7 +397,8 @@ const UserHomeScreen = () => {
                       fontFamily: config.fonts.SemiboldFont,
                       lineHeight: 14,
                       color: config.colors.blackColor,
-                    }}>{`Trekking`}</Text>
+                    }}
+                  >{`Trekking`}</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -355,7 +414,8 @@ const UserHomeScreen = () => {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
           marginHorizontal: 20,
-        }}>
+        }}
+      >
         {userRoadTripResponse?.results?.localUsersWithRoadTrips?.map(
           (item, index) => {
             return (
@@ -363,47 +423,51 @@ const UserHomeScreen = () => {
                 style={{
                   marginTop: 20,
                 }}
-                key={index}>
+                key={index}
+              >
                 <Image
                   source={config.images.TRIP_IMG}
                   style={{
                     borderRadius: 10,
                     height: 231,
-                    width: '100%',
-                    resizeMode: 'cover',
-                    position: 'absolute',
+                    width: "100%",
+                    resizeMode: "cover",
+                    position: "absolute",
                   }}
                 />
                 <View
                   style={{
                     height: 241,
                     // backgroundColor:'cyan'
-                  }}>
+                  }}
+                >
                   <View
                     style={{
                       height: 35,
                       marginTop: 20,
-                      flexDirection: 'row',
-                      justifyContent: 'space-between',
-                    }}>
+                      flexDirection: "row",
+                      justifyContent: "space-between",
+                    }}
+                  >
                     <View
                       style={{
                         height: 28,
-                        width: '38%',
+                        width: "38%",
                         borderTopRightRadius: 12,
                         borderBottomRightRadius: 12,
-                        flexDirection: 'row',
-                        alignItems: 'center',
+                        flexDirection: "row",
+                        alignItems: "center",
                         // justifyContent:'center',
                         backgroundColor: config.colors.yellowColor,
-                      }}>
+                      }}
+                    >
                       <Image
                         source={config.images.BADGE_ICON}
                         style={{
                           marginHorizontal: 5,
                           height: 17,
                           width: 17,
-                          resizeMode: 'contain',
+                          resizeMode: "contain",
                         }}
                       />
                       <Text
@@ -412,27 +476,29 @@ const UserHomeScreen = () => {
                           fontSize: 10,
                           lineHeight: 14,
                           color: config.colors.white,
-                        }}>{`Licensed Tour Guide`}</Text>
+                        }}
+                      >{`Licensed Tour Guide`}</Text>
                     </View>
                     <TouchableOpacity
                       style={{
                         height: 28,
-                        width: '20%',
-                        alignItems: 'center',
-                        justifyContent: 'center',
+                        width: "20%",
+                        alignItems: "center",
+                        justifyContent: "center",
                       }}
                       onPress={() => {
                         Toast.show({
-                          type: 'custom',
-                          text1: 'Coming Soon',
+                          type: "custom",
+                          text1: "Coming Soon",
                         });
-                      }}>
+                      }}
+                    >
                       <Image
                         source={config.images.FAVORITE}
                         style={{
                           height: 24,
                           width: 24,
-                          resizeMode: 'contain',
+                          resizeMode: "contain",
                         }}
                       />
                     </TouchableOpacity>
@@ -440,30 +506,34 @@ const UserHomeScreen = () => {
                 </View>
                 <View
                   style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                  }}>
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                  }}
+                >
                   <Text
                     style={{
                       fontFamily: config.fonts.HeadingFont,
                       fontSize: 16,
                       lineHeight: 20,
                       color: config.colors.blackColor,
-                    }}>
+                    }}
+                  >
                     {item?.fullName}
                   </Text>
                   <View
                     style={{
-                      flexDirection: 'row',
-                    }}>
+                      flexDirection: "row",
+                    }}
+                  >
                     <View
                       style={{
-                        flexDirection: 'row',
-                      }}>
+                        flexDirection: "row",
+                      }}
+                    >
                       <Image
                         source={config.images.STAR_ICON}
-                        style={{height: 20, width: 20, resizeMode: 'contain'}}
+                        style={{ height: 20, width: 20, resizeMode: "contain" }}
                       />
                       <Text
                         style={{
@@ -471,16 +541,18 @@ const UserHomeScreen = () => {
                           fontSize: 15,
                           lineHeight: 20,
                           color: config.colors.blackColor,
-                        }}>{` 4.8 `}</Text>
+                        }}
+                      >{` 4.8 `}</Text>
                     </View>
                     <View
                       style={{
-                        marginLeft:8,
-                        flexDirection: 'row',
-                      }}>
+                        marginLeft: 8,
+                        flexDirection: "row",
+                      }}
+                    >
                       <Image
                         source={config.images.COMMENT_ICON}
-                        style={{height: 20, width: 20, resizeMode: 'contain'}}
+                        style={{ height: 20, width: 20, resizeMode: "contain" }}
                       />
                       <Text
                         style={{
@@ -488,18 +560,20 @@ const UserHomeScreen = () => {
                           fontSize: 15,
                           lineHeight: 20,
                           color: config.colors.blackColor,
-                        }}>{` 23 `}</Text>
+                        }}
+                      >{` 23 `}</Text>
                     </View>
                   </View>
                 </View>
                 <View
                   style={{
-                    flexDirection: 'row',
+                    flexDirection: "row",
                     marginTop: 15,
-                  }}>
+                  }}
+                >
                   <Image
                     source={config.images.LOCATION}
-                    style={{height: 20, width: 20, resizeMode: 'contain'}}
+                    style={{ height: 20, width: 20, resizeMode: "contain" }}
                   />
                   <Text
                     style={{
@@ -507,7 +581,8 @@ const UserHomeScreen = () => {
                       fontFamily: config.fonts.HeadingFont,
                       lineHeight: 16,
                       color: config.colors.blackColor,
-                    }}>
+                    }}
+                  >
                     {item?.countryName}
                   </Text>
                 </View>
@@ -517,27 +592,35 @@ const UserHomeScreen = () => {
                     fontSize: 10,
                     lineHeight: 14,
                     color: config.colors.lightGrey2Color,
-                  }}>{`Lorem Ipsum is simply dummy text of the printing and typesetting industry. `}</Text>
+                  }}
+                >{`Lorem Ipsum is simply dummy text of the printing and typesetting industry. `}</Text>
 
                 <View
                   style={{
                     marginTop: 10,
                     height: 45,
                     marginHorizontal: 20,
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                  }}>
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                  }}
+                >
                   <TouchableOpacity
                     style={{
                       height: 25,
-                      width: '25%',
-                      flexDirection: 'row',
+                      width: "25%",
+                      flexDirection: "row",
                       // justifyContent:'space-between',
-                      alignItems: 'center',
-                    }}>
+                      alignItems: "center",
+                    }}
+                  >
                     <Image
                       source={config.images.CAMPING_ICON}
-                      style={{height: 20, width: 20,marginTop:6, resizeMode: 'contain'}}
+                      style={{
+                        height: 20,
+                        width: 20,
+                        marginTop: 6,
+                        resizeMode: "contain",
+                      }}
                     />
                     <Text
                       style={{
@@ -547,18 +630,25 @@ const UserHomeScreen = () => {
                         fontFamily: config.fonts.MediumFont,
                         lineHeight: 14,
                         color: config.colors.blackColor,
-                      }}>{`Camping`}</Text>
+                      }}
+                    >{`Camping`}</Text>
                   </TouchableOpacity>
                   <TouchableOpacity
                     style={{
                       height: 25,
-                      flexDirection: 'row',
-                      width: '25%',
-                      alignItems: 'center',
-                    }}>
+                      flexDirection: "row",
+                      width: "25%",
+                      alignItems: "center",
+                    }}
+                  >
                     <Image
                       source={config.images.HIKING_ICON}
-                      style={{height: 20, width: 20, marginTop:6, resizeMode: 'contain'}}
+                      style={{
+                        height: 20,
+                        width: 20,
+                        marginTop: 6,
+                        resizeMode: "contain",
+                      }}
                     />
                     <Text
                       style={{
@@ -568,18 +658,25 @@ const UserHomeScreen = () => {
                         fontFamily: config.fonts.MediumFont,
                         lineHeight: 14,
                         color: config.colors.blackColor,
-                      }}>{`Hiking`}</Text>
+                      }}
+                    >{`Hiking`}</Text>
                   </TouchableOpacity>
                   <TouchableOpacity
                     style={{
                       height: 25,
-                      width: '25%',
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                    }}>
+                      width: "25%",
+                      flexDirection: "row",
+                      alignItems: "center",
+                    }}
+                  >
                     <Image
                       source={config.images.TREKKING_ICON}
-                      style={{height: 20, width: 20, marginTop:6, resizeMode: 'contain'}}
+                      style={{
+                        height: 20,
+                        width: 20,
+                        marginTop: 6,
+                        resizeMode: "contain",
+                      }}
                     />
                     <Text
                       style={{
@@ -589,12 +686,13 @@ const UserHomeScreen = () => {
                         fontFamily: config.fonts.SemiboldFont,
                         lineHeight: 14,
                         color: config.colors.blackColor,
-                      }}>{`Trekking`}</Text>
+                      }}
+                    >{`Trekking`}</Text>
                   </TouchableOpacity>
                 </View>
               </View>
             );
-          },
+          }
         )}
 
         {/* <View
@@ -779,7 +877,8 @@ const UserHomeScreen = () => {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
           marginHorizontal: 20,
-        }}>
+        }}
+      >
         {userOffRoadTripResponse?.results?.localUsersWithOffRoadTrips?.map(
           (item, index) => {
             return (
@@ -787,14 +886,15 @@ const UserHomeScreen = () => {
                 style={{
                   marginTop: 20,
                 }}
-                key={index}>
+                key={index}
+              >
                 <Image
                   source={config.images.TRIP_IMG}
                   style={{
                     borderRadius: 10,
                     height: 231,
-                    width: '100%',
-                    resizeMode: 'cover',
+                    width: "100%",
+                    resizeMode: "cover",
                   }}
                 />
                 <Text
@@ -804,17 +904,19 @@ const UserHomeScreen = () => {
                     fontFamily: config.fonts.HeadingFont,
                     lineHeight: 18,
                     color: config.colors.blackColor,
-                  }}>
+                  }}
+                >
                   {item?.fullName}
                 </Text>
                 <View
                   style={{
-                    flexDirection: 'row',
+                    flexDirection: "row",
                     marginTop: 15,
-                  }}>
+                  }}
+                >
                   <Image
                     source={config.images.LOCATION}
-                    style={{height: 20, width: 20, resizeMode: 'contain'}}
+                    style={{ height: 20, width: 20, resizeMode: "contain" }}
                   />
 
                   <Text
@@ -823,7 +925,8 @@ const UserHomeScreen = () => {
                       fontFamily: config.fonts.HeadingFont,
                       lineHeight: 16,
                       color: config.colors.blackColor,
-                    }}>
+                    }}
+                  >
                     {item?.countryName}
                   </Text>
                 </View>
@@ -833,27 +936,35 @@ const UserHomeScreen = () => {
                     fontSize: 10,
                     lineHeight: 14,
                     color: config.colors.lightGrey2Color,
-                  }}>{`Lorem Ipsum is simply dummy text of the printing and typesetting industry. `}</Text>
+                  }}
+                >{`Lorem Ipsum is simply dummy text of the printing and typesetting industry. `}</Text>
 
                 <View
                   style={{
                     marginTop: 10,
                     height: 45,
                     marginHorizontal: 20,
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                  }}>
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                  }}
+                >
                   <TouchableOpacity
                     style={{
                       height: 25,
-                      width: '25%',
-                      flexDirection: 'row',
+                      width: "25%",
+                      flexDirection: "row",
                       // justifyContent:'space-between',
-                      alignItems: 'center',
-                    }}>
+                      alignItems: "center",
+                    }}
+                  >
                     <Image
                       source={config.images.CAMPING_ICON}
-                      style={{height: 20, width: 20, marginTop:6, resizeMode: 'contain'}}
+                      style={{
+                        height: 20,
+                        width: 20,
+                        marginTop: 6,
+                        resizeMode: "contain",
+                      }}
                     />
                     <Text
                       style={{
@@ -863,18 +974,25 @@ const UserHomeScreen = () => {
                         fontFamily: config.fonts.MediumFont,
                         lineHeight: 14,
                         color: config.colors.blackColor,
-                      }}>{`Camping`}</Text>
+                      }}
+                    >{`Camping`}</Text>
                   </TouchableOpacity>
                   <TouchableOpacity
                     style={{
                       height: 25,
-                      flexDirection: 'row',
-                      width: '25%',
-                      alignItems: 'center',
-                    }}>
+                      flexDirection: "row",
+                      width: "25%",
+                      alignItems: "center",
+                    }}
+                  >
                     <Image
                       source={config.images.HIKING_ICON}
-                      style={{height: 20, width: 20, marginTop:6, resizeMode: 'contain'}}
+                      style={{
+                        height: 20,
+                        width: 20,
+                        marginTop: 6,
+                        resizeMode: "contain",
+                      }}
                     />
                     <Text
                       style={{
@@ -884,18 +1002,25 @@ const UserHomeScreen = () => {
                         fontFamily: config.fonts.MediumFont,
                         lineHeight: 14,
                         color: config.colors.blackColor,
-                      }}>{`Hiking`}</Text>
+                      }}
+                    >{`Hiking`}</Text>
                   </TouchableOpacity>
                   <TouchableOpacity
                     style={{
                       height: 25,
-                      width: '25%',
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                    }}>
+                      width: "25%",
+                      flexDirection: "row",
+                      alignItems: "center",
+                    }}
+                  >
                     <Image
                       source={config.images.TREKKING_ICON}
-                      style={{height: 20, width: 20, marginTop:6, resizeMode: 'contain'}}
+                      style={{
+                        height: 20,
+                        width: 20,
+                        marginTop: 6,
+                        resizeMode: "contain",
+                      }}
                     />
                     <Text
                       style={{
@@ -905,12 +1030,13 @@ const UserHomeScreen = () => {
                         fontFamily: config.fonts.SemiboldFont,
                         lineHeight: 14,
                         color: config.colors.blackColor,
-                      }}>{`Trekking`}</Text>
+                      }}
+                    >{`Trekking`}</Text>
                   </TouchableOpacity>
                 </View>
               </View>
             );
-          },
+          }
         )}
       </ScrollView>
     );
@@ -924,7 +1050,8 @@ const UserHomeScreen = () => {
         visible={filterModalVisible}
         onRequestClose={() => {
           setFilterModalVisible(!filterModalVisible);
-        }}>
+        }}
+      >
         <StatusBar
           barStyle="light-content"
           backgroundColor="rgba(60, 61, 62, 0.8)"
@@ -935,25 +1062,28 @@ const UserHomeScreen = () => {
           style={{
             flex: 1,
             width: `100%`,
-            justifyContent: 'flex-end',
+            justifyContent: "flex-end",
             // paddingHorizontal: 20,
-            backgroundColor: 'rgba(60, 61, 62, 0.8)',
-          }}>
+            backgroundColor: "rgba(60, 61, 62, 0.8)",
+          }}
+        >
           <View
             style={{
               maxHeight: config.constants.Height / 1.12,
 
               borderRadius: 24,
               backgroundColor: config.colors.white,
-            }}>
+            }}
+          >
             <ScrollView
               showsVerticalScrollIndicator={false}
               contentContainerStyle={{
-                justifyContent: 'center',
+                justifyContent: "center",
                 paddingHorizontal: 25,
                 paddingVertical: 10,
               }}
-              nestedScrollEnabled>
+              nestedScrollEnabled
+            >
               <Text
                 style={{
                   marginTop: 15,
@@ -961,44 +1091,47 @@ const UserHomeScreen = () => {
                   fontSize: 20,
                   lineHeight: 26,
                   color: config.colors.blackColor,
-                }}>{`Local Gender`}</Text>
+                }}
+              >{`Local Gender`}</Text>
 
               <View
                 style={{
-                  flexDirection: 'row',
+                  flexDirection: "row",
                   marginTop: 15,
-                }}>
+                }}
+              >
                 <TouchableOpacity
                   style={{
-                    flexDirection: 'row',
+                    flexDirection: "row",
                     marginRight: 8,
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
+                    justifyContent: "space-between",
+                    alignItems: "center",
                     paddingHorizontal: 12,
                     paddingVertical: 7,
                     borderRadius: 18,
                     borderWidth: 1,
                     borderColor: config.colors.yellowColor,
                     backgroundColor:
-                      gender == 'Male'
+                      gender == "Male"
                         ? config.colors.yellowColor
                         : config.colors.white,
                   }}
                   onPress={() => {
-                    setGender('Male');
-                  }}>
+                    setGender("Male");
+                  }}
+                >
                   <Image
                     source={config.images.MALE_ICON}
                     style={{
                       height: 23,
                       width: 23,
-                      marginTop:5,
+                      marginTop: 5,
                       marginRight: 5,
                       tintColor:
-                        gender == 'Male'
+                        gender == "Male"
                           ? config.colors.white
                           : config.colors.yellowColor,
-                      resizeMode: 'contain',
+                      resizeMode: "contain",
                     }}
                   />
                   <Text
@@ -1007,30 +1140,32 @@ const UserHomeScreen = () => {
                       fontFamily: config.fonts.SemiboldFont,
                       lineHeight: 14,
                       color:
-                        gender == 'Male'
+                        gender == "Male"
                           ? config.colors.white
                           : config.colors.yellowColor,
-                    }}>{`Male`}</Text>
+                    }}
+                  >{`Male`}</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
                   style={{
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    alignItems: "center",
                     paddingHorizontal: 12,
                     paddingVertical: 7,
                     borderRadius: 18,
                     borderWidth: 1,
                     borderColor: config.colors.yellowColor,
                     backgroundColor:
-                      gender == 'Female'
+                      gender == "Female"
                         ? config.colors.yellowColor
                         : config.colors.white,
                   }}
                   onPress={() => {
-                    setGender('Female');
-                  }}>
+                    setGender("Female");
+                  }}
+                >
                   <Image
                     source={config.images.FEMALE_ICON}
                     style={{
@@ -1038,10 +1173,10 @@ const UserHomeScreen = () => {
                       width: 20,
                       marginRight: 5,
                       tintColor:
-                        gender == 'Female'
+                        gender == "Female"
                           ? config.colors.white
                           : config.colors.yellowColor,
-                      resizeMode: 'contain',
+                      resizeMode: "contain",
                     }}
                   />
                   <Text
@@ -1050,21 +1185,23 @@ const UserHomeScreen = () => {
                       fontFamily: config.fonts.SemiboldFont,
                       lineHeight: 14,
                       color:
-                        gender == 'Female'
+                        gender == "Female"
                           ? config.colors.white
                           : config.colors.yellowColor,
-                    }}>{`Female`}</Text>
+                    }}
+                  >{`Female`}</Text>
                 </TouchableOpacity>
               </View>
 
               <View
                 style={{
                   marginTop: 15,
-                  flexDirection: 'row',
-                }}>
+                  flexDirection: "row",
+                }}
+              >
                 <Image
                   source={config.images.CHECK_VERIFIED_ICON}
-                  style={{height: 20, width: 20, resizeMode: 'contain'}}
+                  style={{ height: 20, width: 20, resizeMode: "contain" }}
                 />
                 <Text
                   style={{
@@ -1073,9 +1210,34 @@ const UserHomeScreen = () => {
                     lineHeight: 18,
                     marginLeft: 10,
                     color: config.colors.blackColor,
-                  }}>{`Licenced`}</Text>
+                  }}
+                >{`Licenced`}</Text>
               </View>
-              <View
+
+              <Pressable onPress={toggleSwitch} style={styles.pressable}>
+                <LinearGradient
+                  colors={isEnabled ? defaultStyles.bgGradientColors : activeStyles.headGradientColors}
+                  style={styles.backgroundGradient}
+                  start={{
+                    x: 0,
+                    y: 0.5,
+                  }}
+                >
+                  <View style={styles.innerContainer}>
+                    <Animated.View
+                      style={{
+                        transform: [{ translateX }],
+                      }}
+                    >
+                      <LinearGradient
+                        colors={defaultStyles.headGradientColors}
+                        style={styles.headGradient}
+                      />
+                    </Animated.View>
+                  </View>
+                </LinearGradient>
+              </Pressable>
+              {/* <View
                 style={{
                   marginTop: 15,
                   alignItems: 'flex-start',
@@ -1101,8 +1263,8 @@ const UserHomeScreen = () => {
                     setRenderSwitch(!renderSwitch);
                   }}
                   style={{transform: [{scaleX: 1.5}, {scaleY: 1.5}]}}
-                /> */}
-              </View>
+                /> 
+              </View> */}
 
               <Text
                 style={{
@@ -1111,7 +1273,8 @@ const UserHomeScreen = () => {
                   fontSize: 15,
                   lineHeight: 18,
                   color: config.colors.blackColor,
-                }}>{`Trip Price `}</Text>
+                }}
+              >{`Trip Price `}</Text>
 
               <Text
                 style={{
@@ -1120,15 +1283,16 @@ const UserHomeScreen = () => {
                   fontSize: 15,
                   lineHeight: 18,
                   color: config.colors.blackColor,
-                }}>{`SAR  0  -   SAR ${sliderValue}`}</Text>
+                }}
+              >{`SAR  0  -   SAR ${sliderValue}`}</Text>
 
               <Slider
-                style={{width: '100%', height: 40}}
+                style={{ width: "100%", height: 40 }}
                 minimumValue={1}
                 maximumValue={135}
                 value={sliderValue}
                 step={1}
-                onValueChange={val => setSliderValue(val)}
+                onValueChange={(val) => setSliderValue(val)}
                 thumbTintColor={config.colors.primaryColor}
                 minimumTrackTintColor={config.colors.primaryColor}
                 maximumTrackTintColor={config.colors.lightGrey2Color}
@@ -1141,66 +1305,71 @@ const UserHomeScreen = () => {
                   fontSize: 15,
                   lineHeight: 18,
                   color: config.colors.blackColor,
-                }}>{`Select Activities`}</Text>
+                }}
+              >{`Select Activities`}</Text>
 
               <View
                 style={{
-                  flexDirection: 'row',
-                  flexWrap: 'wrap',
+                  flexDirection: "row",
+                  flexWrap: "wrap",
                   // marginTop: 15,
-                }}>
+                }}
+              >
                 <TouchableOpacity
                   style={{
                     marginVertical: 8,
-                    flexDirection: 'row',
+                    flexDirection: "row",
                     marginRight: 8,
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
+                    justifyContent: "space-between",
+                    alignItems: "center",
                     paddingHorizontal: 12,
                     paddingVertical: 7,
                     borderRadius: 18,
                     borderWidth: 1,
                     borderColor: config.colors.yellowColor,
                     backgroundColor:
-                      selectActivity == 'All'
+                      selectActivity == "All"
                         ? config.colors.yellowColor
                         : config.colors.white,
                   }}
                   onPress={() => {
-                    setSelectActivity('All');
-                  }}>
+                    setSelectActivity("All");
+                  }}
+                >
                   <Text
                     style={{
                       fontSize: 12,
                       fontFamily: config.fonts.SemiboldFont,
                       lineHeight: 14,
                       color:
-                        selectActivity == 'All'
+                        selectActivity == "All"
                           ? config.colors.white
                           : config.colors.yellowColor,
-                    }}>{`All`}</Text>
+                    }}
+                  >{`All`}</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
                   style={{
                     marginRight: 8,
                     marginVertical: 8,
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    alignItems: "center",
                     paddingHorizontal: 12,
                     paddingVertical: 7,
                     borderRadius: 18,
                     borderWidth: 1,
                     borderColor: config.colors.yellowColor,
                     backgroundColor:
-                      selectActivity == 'Camping'
+                      selectActivity == "Camping"
                         ? config.colors.yellowColor
                         : config.colors.white,
                   }}
                   onPress={() => {
-                    setSelectActivity('Camping');
-                  }}>
+                    setSelectActivity("Camping");
+                  }}
+                >
                   <Image
                     source={config.images.CAMPING_ICON}
                     style={{
@@ -1208,10 +1377,10 @@ const UserHomeScreen = () => {
                       width: 20,
                       marginRight: 5,
                       tintColor:
-                        selectActivity == 'Camping'
+                        selectActivity == "Camping"
                           ? config.colors.white
                           : config.colors.yellowColor,
-                      resizeMode: 'contain',
+                      resizeMode: "contain",
                     }}
                   />
                   <Text
@@ -1220,32 +1389,34 @@ const UserHomeScreen = () => {
                       fontFamily: config.fonts.SemiboldFont,
                       lineHeight: 14,
                       color:
-                        selectActivity == 'Camping'
+                        selectActivity == "Camping"
                           ? config.colors.white
                           : config.colors.yellowColor,
-                    }}>{`Camping`}</Text>
+                    }}
+                  >{`Camping`}</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
                   style={{
-                    flexDirection: 'row',
+                    flexDirection: "row",
                     marginVertical: 8,
                     marginRight: 8,
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
+                    justifyContent: "space-between",
+                    alignItems: "center",
                     paddingHorizontal: 12,
                     paddingVertical: 7,
                     borderRadius: 18,
                     borderWidth: 1,
                     borderColor: config.colors.yellowColor,
                     backgroundColor:
-                      selectActivity == 'Wildlife Viewing'
+                      selectActivity == "Wildlife Viewing"
                         ? config.colors.yellowColor
                         : config.colors.white,
                   }}
                   onPress={() => {
-                    setSelectActivity('Wildlife Viewing');
-                  }}>
+                    setSelectActivity("Wildlife Viewing");
+                  }}
+                >
                   <Image
                     source={config.images.WILDLIFE_ICON}
                     style={{
@@ -1253,10 +1424,10 @@ const UserHomeScreen = () => {
                       width: 20,
                       marginRight: 5,
                       tintColor:
-                        selectActivity == 'Wildlife Viewing'
+                        selectActivity == "Wildlife Viewing"
                           ? config.colors.white
                           : config.colors.yellowColor,
-                      resizeMode: 'contain',
+                      resizeMode: "contain",
                     }}
                   />
                   <Text
@@ -1265,32 +1436,34 @@ const UserHomeScreen = () => {
                       fontFamily: config.fonts.SemiboldFont,
                       lineHeight: 14,
                       color:
-                        selectActivity == 'Wildlife Viewing'
+                        selectActivity == "Wildlife Viewing"
                           ? config.colors.white
                           : config.colors.yellowColor,
-                    }}>{`Wildlife Viewing`}</Text>
+                    }}
+                  >{`Wildlife Viewing`}</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
                   style={{
-                    flexDirection: 'row',
+                    flexDirection: "row",
                     marginRight: 8,
                     marginVertical: 8,
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
+                    justifyContent: "space-between",
+                    alignItems: "center",
                     paddingHorizontal: 12,
                     paddingVertical: 7,
                     borderRadius: 18,
                     borderWidth: 1,
                     borderColor: config.colors.yellowColor,
                     backgroundColor:
-                      selectActivity == 'Bonfire'
+                      selectActivity == "Bonfire"
                         ? config.colors.yellowColor
                         : config.colors.white,
                   }}
                   onPress={() => {
-                    setSelectActivity('Bonfire');
-                  }}>
+                    setSelectActivity("Bonfire");
+                  }}
+                >
                   <Image
                     source={config.images.BONFIRE_ICON}
                     style={{
@@ -1298,10 +1471,10 @@ const UserHomeScreen = () => {
                       width: 20,
                       marginRight: 5,
                       tintColor:
-                        selectActivity == 'Bonfire'
+                        selectActivity == "Bonfire"
                           ? config.colors.white
                           : config.colors.yellowColor,
-                      resizeMode: 'contain',
+                      resizeMode: "contain",
                     }}
                   />
                   <Text
@@ -1310,32 +1483,34 @@ const UserHomeScreen = () => {
                       fontFamily: config.fonts.SemiboldFont,
                       lineHeight: 14,
                       color:
-                        selectActivity == 'Bonfire'
+                        selectActivity == "Bonfire"
                           ? config.colors.white
                           : config.colors.yellowColor,
-                    }}>{`Bonfire`}</Text>
+                    }}
+                  >{`Bonfire`}</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
                   style={{
-                    flexDirection: 'row',
+                    flexDirection: "row",
                     marginRight: 8,
                     marginVertical: 8,
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
+                    justifyContent: "space-between",
+                    alignItems: "center",
                     paddingHorizontal: 12,
                     paddingVertical: 7,
                     borderRadius: 18,
                     borderWidth: 1,
                     borderColor: config.colors.yellowColor,
                     backgroundColor:
-                      selectActivity == 'Boat Tourink'
+                      selectActivity == "Boat Tourink"
                         ? config.colors.yellowColor
                         : config.colors.white,
                   }}
                   onPress={() => {
-                    setSelectActivity('Boat Tourink');
-                  }}>
+                    setSelectActivity("Boat Tourink");
+                  }}
+                >
                   <Image
                     source={config.images.BOATING_ICON}
                     style={{
@@ -1343,10 +1518,10 @@ const UserHomeScreen = () => {
                       width: 20,
                       marginRight: 5,
                       tintColor:
-                        selectActivity == 'Boat Tourink'
+                        selectActivity == "Boat Tourink"
                           ? config.colors.white
                           : config.colors.yellowColor,
-                      resizeMode: 'contain',
+                      resizeMode: "contain",
                     }}
                   />
                   <Text
@@ -1355,32 +1530,34 @@ const UserHomeScreen = () => {
                       fontFamily: config.fonts.SemiboldFont,
                       lineHeight: 14,
                       color:
-                        selectActivity == 'Boat Tourink'
+                        selectActivity == "Boat Tourink"
                           ? config.colors.white
                           : config.colors.yellowColor,
-                    }}>{`Boat Tourink`}</Text>
+                    }}
+                  >{`Boat Tourink`}</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
                   style={{
-                    flexDirection: 'row',
+                    flexDirection: "row",
                     marginRight: 8,
                     marginVertical: 8,
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
+                    justifyContent: "space-between",
+                    alignItems: "center",
                     paddingHorizontal: 12,
                     paddingVertical: 7,
                     borderRadius: 18,
                     borderWidth: 1,
                     borderColor: config.colors.yellowColor,
                     backgroundColor:
-                      selectActivity == 'Hiking'
+                      selectActivity == "Hiking"
                         ? config.colors.yellowColor
                         : config.colors.white,
                   }}
                   onPress={() => {
-                    setSelectActivity('Hiking');
-                  }}>
+                    setSelectActivity("Hiking");
+                  }}
+                >
                   <Image
                     source={config.images.HIKING_ICON}
                     style={{
@@ -1388,10 +1565,10 @@ const UserHomeScreen = () => {
                       width: 20,
                       marginRight: 5,
                       tintColor:
-                        selectActivity == 'Hiking'
+                        selectActivity == "Hiking"
                           ? config.colors.white
                           : config.colors.yellowColor,
-                      resizeMode: 'contain',
+                      resizeMode: "contain",
                     }}
                   />
                   <Text
@@ -1400,10 +1577,11 @@ const UserHomeScreen = () => {
                       fontFamily: config.fonts.SemiboldFont,
                       lineHeight: 14,
                       color:
-                        selectActivity == 'Hiking'
+                        selectActivity == "Hiking"
                           ? config.colors.white
                           : config.colors.yellowColor,
-                    }}>{`Hiking`}</Text>
+                    }}
+                  >{`Hiking`}</Text>
                 </TouchableOpacity>
               </View>
 
@@ -1414,34 +1592,37 @@ const UserHomeScreen = () => {
                   fontSize: 15,
                   lineHeight: 18,
                   color: config.colors.blackColor,
-                }}>{`Do you need special care?`}</Text>
+                }}
+              >{`Do you need special care?`}</Text>
 
               <View
                 style={{
-                  flexDirection: 'row',
-                  flexWrap: 'wrap',
+                  flexDirection: "row",
+                  flexWrap: "wrap",
                   // marginTop: 15,
-                }}>
+                }}
+              >
                 <TouchableOpacity
                   style={{
                     marginRight: 8,
                     marginVertical: 8,
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    alignItems: "center",
                     paddingHorizontal: 12,
                     paddingVertical: 7,
                     borderRadius: 18,
                     borderWidth: 1,
                     borderColor: config.colors.yellowColor,
                     backgroundColor:
-                      selectSpatialCare == 'Wheelchair'
+                      selectSpatialCare == "Wheelchair"
                         ? config.colors.yellowColor
                         : config.colors.white,
                   }}
                   onPress={() => {
-                    setSelectSpatialCare('Wheelchair');
-                  }}>
+                    setSelectSpatialCare("Wheelchair");
+                  }}
+                >
                   <Image
                     source={config.images.WHEELCHAIR_ICON}
                     style={{
@@ -1449,10 +1630,10 @@ const UserHomeScreen = () => {
                       width: 20,
                       marginRight: 5,
                       tintColor:
-                        selectSpatialCare == 'Wheelchair'
+                        selectSpatialCare == "Wheelchair"
                           ? config.colors.white
                           : config.colors.yellowColor,
-                      resizeMode: 'contain',
+                      resizeMode: "contain",
                     }}
                   />
                   <Text
@@ -1461,32 +1642,34 @@ const UserHomeScreen = () => {
                       fontFamily: config.fonts.SemiboldFont,
                       lineHeight: 14,
                       color:
-                        selectSpatialCare == 'Wheelchair'
+                        selectSpatialCare == "Wheelchair"
                           ? config.colors.white
                           : config.colors.yellowColor,
-                    }}>{`Wheelchair`}</Text>
+                    }}
+                  >{`Wheelchair`}</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
                   style={{
-                    flexDirection: 'row',
+                    flexDirection: "row",
                     marginVertical: 8,
                     marginRight: 8,
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
+                    justifyContent: "space-between",
+                    alignItems: "center",
                     paddingHorizontal: 12,
                     paddingVertical: 7,
                     borderRadius: 18,
                     borderWidth: 1,
                     borderColor: config.colors.yellowColor,
                     backgroundColor:
-                      selectSpatialCare == 'Blind'
+                      selectSpatialCare == "Blind"
                         ? config.colors.yellowColor
                         : config.colors.white,
                   }}
                   onPress={() => {
-                    setSelectSpatialCare('Blind');
-                  }}>
+                    setSelectSpatialCare("Blind");
+                  }}
+                >
                   <Image
                     source={config.images.CLOSE_EYE_ICON}
                     style={{
@@ -1494,10 +1677,10 @@ const UserHomeScreen = () => {
                       width: 20,
                       marginRight: 5,
                       tintColor:
-                        selectSpatialCare == 'Blind'
+                        selectSpatialCare == "Blind"
                           ? config.colors.white
                           : config.colors.yellowColor,
-                      resizeMode: 'contain',
+                      resizeMode: "contain",
                     }}
                   />
                   <Text
@@ -1506,32 +1689,34 @@ const UserHomeScreen = () => {
                       fontFamily: config.fonts.SemiboldFont,
                       lineHeight: 14,
                       color:
-                        selectSpatialCare == 'Blind'
+                        selectSpatialCare == "Blind"
                           ? config.colors.white
                           : config.colors.yellowColor,
-                    }}>{`Blind`}</Text>
+                    }}
+                  >{`Blind`}</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
                   style={{
-                    flexDirection: 'row',
+                    flexDirection: "row",
                     marginRight: 8,
                     marginVertical: 8,
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
+                    justifyContent: "space-between",
+                    alignItems: "center",
                     paddingHorizontal: 12,
                     paddingVertical: 7,
                     borderRadius: 18,
                     borderWidth: 1,
                     borderColor: config.colors.yellowColor,
                     backgroundColor:
-                      selectSpatialCare == 'Any Injuries'
+                      selectSpatialCare == "Any Injuries"
                         ? config.colors.yellowColor
                         : config.colors.white,
                   }}
                   onPress={() => {
-                    setSelectSpatialCare('Any Injuries');
-                  }}>
+                    setSelectSpatialCare("Any Injuries");
+                  }}
+                >
                   <Image
                     source={config.images.BANDAIDS_ICON}
                     style={{
@@ -1539,10 +1724,10 @@ const UserHomeScreen = () => {
                       width: 20,
                       marginRight: 5,
                       tintColor:
-                        selectSpatialCare == 'Any Injuries'
+                        selectSpatialCare == "Any Injuries"
                           ? config.colors.white
                           : config.colors.yellowColor,
-                      resizeMode: 'contain',
+                      resizeMode: "contain",
                     }}
                   />
                   <Text
@@ -1551,32 +1736,34 @@ const UserHomeScreen = () => {
                       fontFamily: config.fonts.SemiboldFont,
                       lineHeight: 14,
                       color:
-                        selectSpatialCare == 'Any Injuries'
+                        selectSpatialCare == "Any Injuries"
                           ? config.colors.white
                           : config.colors.yellowColor,
-                    }}>{`Any Injuries`}</Text>
+                    }}
+                  >{`Any Injuries`}</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
                   style={{
-                    flexDirection: 'row',
+                    flexDirection: "row",
                     marginRight: 8,
                     marginVertical: 8,
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
+                    justifyContent: "space-between",
+                    alignItems: "center",
                     paddingHorizontal: 12,
                     paddingVertical: 7,
                     borderRadius: 18,
                     borderWidth: 1,
                     borderColor: config.colors.yellowColor,
                     backgroundColor:
-                      selectSpatialCare == 'Deaf'
+                      selectSpatialCare == "Deaf"
                         ? config.colors.yellowColor
                         : config.colors.white,
                   }}
                   onPress={() => {
-                    setSelectSpatialCare('Deaf');
-                  }}>
+                    setSelectSpatialCare("Deaf");
+                  }}
+                >
                   <Image
                     source={config.images.CLOSE_EAR_ICON}
                     style={{
@@ -1584,10 +1771,10 @@ const UserHomeScreen = () => {
                       width: 20,
                       marginRight: 5,
                       tintColor:
-                        selectSpatialCare == 'Deaf'
+                        selectSpatialCare == "Deaf"
                           ? config.colors.white
                           : config.colors.yellowColor,
-                      resizeMode: 'contain',
+                      resizeMode: "contain",
                     }}
                   />
                   <Text
@@ -1596,61 +1783,67 @@ const UserHomeScreen = () => {
                       fontFamily: config.fonts.SemiboldFont,
                       lineHeight: 14,
                       color:
-                        selectSpatialCare == 'Deaf'
+                        selectSpatialCare == "Deaf"
                           ? config.colors.white
                           : config.colors.yellowColor,
-                    }}>{`Deaf`}</Text>
+                    }}
+                  >{`Deaf`}</Text>
                 </TouchableOpacity>
               </View>
 
               <View
                 style={{
                   marginVertical: 20,
-                  width: '100%',
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                }}>
+                  width: "100%",
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                }}
+              >
                 <TouchableOpacity
                   style={{
                     height: 44,
                     borderRadius: 12,
-                    width: '46%',
+                    width: "46%",
                     borderWidth: 1,
                     borderColor: config.colors.yellowColor,
-                    alignItems: 'center',
-                    justifyContent: 'center',
+                    alignItems: "center",
+                    justifyContent: "center",
                   }}
                   onPress={() => {
                     setFilterModalVisible(false);
-                  }}>
+                  }}
+                >
                   <Text
                     style={{
                       fontFamily: config.fonts.HeadingFont,
                       fontSize: 16,
                       lineHeight: 20,
                       color: config.colors.yellowColor,
-                    }}>{`Reset`}</Text>
+                    }}
+                  >{`Reset`}</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={{
                     height: 44,
                     borderRadius: 12,
-                    width: '46%',
+                    width: "46%",
                     backgroundColor: config.colors.yellowColor,
-                    alignItems: 'center',
-                    justifyContent: 'center',
+                    alignItems: "center",
+                    justifyContent: "center",
                   }}
                   onPress={() => {
                     callUserFilterApi();
-                  }}>
+                  }}
+                >
                   <Text
                     style={{
                       fontFamily: config.fonts.HeadingFont,
                       fontSize: 16,
                       lineHeight: 20,
                       color: config.colors.white,
-                    }}>{`Apply`}</Text>
+                    }}
+                  >{`Apply`}</Text>
                 </TouchableOpacity>
               </View>
             </ScrollView>
@@ -1665,9 +1858,10 @@ const UserHomeScreen = () => {
       style={{
         flex: 1,
         backgroundColor: config.colors.primaryColor,
-      }}>
+      }}
+    >
       <StatusBar
-        barStyle={'dark-content'}
+        barStyle={"dark-content"}
         translucent={false}
         backgroundColor={config.colors.primaryColor}
       />
@@ -1676,9 +1870,10 @@ const UserHomeScreen = () => {
           height: 60,
           marginHorizontal: 20,
           marginTop: 20,
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-        }}>
+          flexDirection: "row",
+          justifyContent: "space-between",
+        }}
+      >
         <View>
           <Text
             style={{
@@ -1686,14 +1881,16 @@ const UserHomeScreen = () => {
               fontSize: 20,
               lineHeight: 26,
               color: config.colors.white,
-            }}>{`Welcome`}</Text>
+            }}
+          >{`Welcome`}</Text>
           <Text
             style={{
               fontFamily: config.fonts.PrimaryFont,
               fontSize: 15,
               lineHeight: 26,
               color: config.colors.white,
-            }}>{`${userGetProfileResponse?.results?.user?.fullName}`}</Text>
+            }}
+          >{`${userGetProfileResponse?.results?.user?.fullName}`}</Text>
         </View>
         <TouchableOpacity
           style={{
@@ -1701,13 +1898,14 @@ const UserHomeScreen = () => {
           }}
           onPress={() => {
             Toast.show({
-              type: 'custom',
-              text1: 'Coming Soon',
+              type: "custom",
+              text1: "Coming Soon",
             });
-          }}>
+          }}
+        >
           <Image
             source={config.images.NOTIFICATION}
-            style={{height: 26, width: 26, resizeMode: 'contain'}}
+            style={{ height: 26, width: 26, resizeMode: "contain" }}
           />
         </TouchableOpacity>
       </View>
@@ -1715,31 +1913,34 @@ const UserHomeScreen = () => {
         style={{
           height: 48,
           marginHorizontal: 20,
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-        }}>
+          flexDirection: "row",
+          justifyContent: "space-between",
+        }}
+      >
         <View
           style={{
             height: 48,
             // paddingTop: Platform.OS == 'android' ? 18 : 0,
-            width: '82%',
+            width: "82%",
             borderRadius: 14,
             paddingHorizontal: 8,
-            alignItems: 'center',
-            flexDirection: 'row',
+            alignItems: "center",
+            flexDirection: "row",
             backgroundColor: config.colors.white,
-          }}>
+          }}
+        >
           <Image
             source={config.images.SEARCH_ICON}
-            style={{height: 21, width: 21, resizeMode: 'contain'}}
+            style={{ height: 21, width: 21, resizeMode: "contain" }}
           />
           <View
             style={{
-              width:'90%',
-              flexDirection: 'column',
-              justifyContent: 'center',
+              width: "90%",
+              flexDirection: "column",
+              justifyContent: "center",
               marginLeft: 8,
-            }}>
+            }}
+          >
             {/* <Text
               style={{
                 fontFamily: config.fonts.MediumFont,
@@ -1748,9 +1949,8 @@ const UserHomeScreen = () => {
                 color: config.colors.lightGrey2Color,
               }}>{`Where to ?`}</Text> */}
             <TextInput
-            
               style={{
-                width:'100%',
+                width: "100%",
                 fontFamily: config.fonts.MediumFont,
                 fontSize: 14,
                 lineHeight: 20,
@@ -1758,13 +1958,12 @@ const UserHomeScreen = () => {
                 color: config.colors.lightGrey2Color,
               }}
               placeholder={`Where to ? Anywhere- Any date`}
-              keyboardType={'default'}
+              keyboardType={"default"}
               placeholderTextColor={config.colors.lightGrey2Color}
               value={search}
-              returnKeyType='done'
-             
-              onChangeText={val => {
-                debouncedFetchSuggestions(val)
+              returnKeyType="done"
+              onChangeText={(val) => {
+                debouncedFetchSuggestions(val);
               }}
             />
           </View>
@@ -1772,18 +1971,19 @@ const UserHomeScreen = () => {
         <TouchableOpacity
           style={{
             height: 48,
-            width: '15%',
-            justifyContent: 'center',
-            alignItems: 'center',
+            width: "15%",
+            justifyContent: "center",
+            alignItems: "center",
             borderRadius: 14,
             backgroundColor: config.colors.white,
           }}
           onPress={() => {
             setFilterModalVisible(true);
-          }}>
+          }}
+        >
           <Image
             source={config.images.FILTER_ICON}
-            style={{height: 24, width: 24, resizeMode: 'contain'}}
+            style={{ height: 24, width: 24, resizeMode: "contain" }}
           />
         </TouchableOpacity>
       </View>
@@ -1793,26 +1993,28 @@ const UserHomeScreen = () => {
           height: 45,
           // backgroundColor:'pink',
           marginHorizontal: 20,
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-        }}>
+          flexDirection: "row",
+          justifyContent: "space-between",
+        }}
+      >
         <TouchableOpacity
           style={{
             height: 45,
-            width: '32%',
-            alignItems: 'center',
+            width: "32%",
+            alignItems: "center",
             borderBottomWidth: 1,
             borderColor:
-              trip == 'Popular Cities'
+              trip == "Popular Cities"
                 ? config.colors.white
                 : config.colors.primaryColor,
           }}
           onPress={() => {
-            setTrip('Popular Cities');
-          }}>
+            setTrip("Popular Cities");
+          }}
+        >
           <Image
             source={config.images.POPULAR_TRIP}
-            style={{height: 20, width: 20, resizeMode: 'contain'}}
+            style={{ height: 20, width: 20, resizeMode: "contain" }}
           />
           <Text
             style={{
@@ -1821,25 +2023,27 @@ const UserHomeScreen = () => {
               fontFamily: config.fonts.MediumFont,
               lineHeight: 14,
               color: config.colors.white,
-            }}>{`Popular Cities`}</Text>
+            }}
+          >{`Popular Cities`}</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={{
             height: 45,
-            width: '32%',
-            alignItems: 'center',
+            width: "32%",
+            alignItems: "center",
             borderBottomWidth: 1,
             borderColor:
-              trip == 'Road Trip'
+              trip == "Road Trip"
                 ? config.colors.white
                 : config.colors.primaryColor,
           }}
           onPress={() => {
-            setTrip('Road Trip');
-          }}>
+            setTrip("Road Trip");
+          }}
+        >
           <Image
             source={config.images.ROAD_TRIP}
-            style={{height: 20, width: 20, resizeMode: 'contain'}}
+            style={{ height: 20, width: 20, resizeMode: "contain" }}
           />
           <Text
             style={{
@@ -1848,25 +2052,27 @@ const UserHomeScreen = () => {
               fontFamily: config.fonts.MediumFont,
               lineHeight: 14,
               color: config.colors.white,
-            }}>{`Road Trip`}</Text>
+            }}
+          >{`Road Trip`}</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={{
             height: 45,
-            width: '32%',
-            alignItems: 'center',
+            width: "32%",
+            alignItems: "center",
             borderBottomWidth: 1,
             borderColor:
-              trip == 'Off- Road Trip'
+              trip == "Off- Road Trip"
                 ? config.colors.white
                 : config.colors.primaryColor,
           }}
           onPress={() => {
-            setTrip('Off- Road Trip');
-          }}>
+            setTrip("Off- Road Trip");
+          }}
+        >
           <Image
             source={config.images.OFF_SITE_TRIP}
-            style={{height: 20, width: 20, resizeMode: 'contain'}}
+            style={{ height: 20, width: 20, resizeMode: "contain" }}
           />
           <Text
             style={{
@@ -1875,7 +2081,8 @@ const UserHomeScreen = () => {
               fontFamily: config.fonts.MediumFont,
               lineHeight: 14,
               color: config.colors.white,
-            }}>{`Off- Road Trip`}</Text>
+            }}
+          >{`Off- Road Trip`}</Text>
         </TouchableOpacity>
       </View>
 
@@ -1886,12 +2093,13 @@ const UserHomeScreen = () => {
           borderTopRightRadius: 20,
           borderTopLeftRadius: 20,
           backgroundColor: config.colors.white,
-        }}>
-        {trip == 'Popular Cities'
+        }}
+      >
+        {trip == "Popular Cities"
           ? popularCity()
-          : trip == 'Road Trip'
+          : trip == "Road Trip"
           ? roadTrip()
-          : trip == 'Off- Road Trip'
+          : trip == "Off- Road Trip"
           ? offSiteTrip()
           : null}
       </View>
@@ -1902,4 +2110,26 @@ const UserHomeScreen = () => {
 
 export default UserHomeScreen;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  pressable: {
+    marginTop:15,
+    width: 56,
+    height: 32,
+    borderRadius: 16,
+  },
+  backgroundGradient: {
+    borderRadius: 16,
+    flex: 1,
+  },
+  innerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+    position: 'relative',
+  },
+  headGradient: {
+    width: 24,
+    height: 24,
+    borderRadius: 100,
+  },
+});

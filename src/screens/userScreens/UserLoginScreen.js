@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   View,
   ScrollView,
+  Modal,
 } from 'react-native';
 import React, {useCallback, useEffect, useState} from 'react';
 import config from '../../config';
@@ -39,12 +40,15 @@ const UserLoginScreen = ({navigation, route}) => {
   const [countryFlag, setCountryFlag] = useState('');
   const [test1, setTest1] = useState('');
   const [test2, setTest2] = useState('');
+  const [selectUserModal, setSelectUserModal] = useState(false);
+  const [selectedUser, setSelectedUser] = useState('');
   const [test3, setTest3] = useState('');
   const [focusPassword, setFocusPassword] = useState(false);
   const userLoginResponse = useSelector(UserLoginReducer.selectUserLoginData);
   const userLoginErrorResponse = useSelector(
     UserLoginReducer.selectUserLoginResponse,
   );
+  // alert(route?.params?.from)
 
   //hooks call
   useEffect(() => {
@@ -82,6 +86,12 @@ const UserLoginScreen = ({navigation, route}) => {
       }
     }
   }, [userLoginErrorResponse]);
+
+//   useEffect(() => {
+// if(route?.params?.from == 'logout'){
+//   setSelectUserModal(true)
+// }
+//   },[])
 
   useFocusEffect(
     useCallback(() => {
@@ -177,6 +187,220 @@ const UserLoginScreen = ({navigation, route}) => {
         }}
       />
       </SafeAreaView>
+    );
+  };
+
+  const SelectUserModalView = () => {
+    return (
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={selectUserModal}
+        onRequestClose={() => {
+          setSelectUserModal(!selectUserModal);
+        }}>
+        <StatusBar
+          barStyle="light-content"
+          backgroundColor="rgba(60, 61, 62, 0.8)"
+        />
+        <TouchableOpacity
+          activeOpacity={0.8}
+          onPress={() => setSelectUserModal(false)}
+          style={{
+            flex: 1,
+            width: `100%`,
+            justifyContent: 'center',
+            paddingHorizontal: 20,
+            backgroundColor: 'rgba(60, 61, 62, 0.8)',
+          }}>
+          <View
+            style={{
+              maxHeight: config.constants.Height / 1.5,
+
+              borderRadius: 24,
+              backgroundColor: config.colors.white,
+            }}>
+            <ScrollView
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={{
+                paddingHorizontal: 25,
+                paddingVertical: 10,
+              }}
+              nestedScrollEnabled>
+              <Text
+                style={{
+                  marginVertical: 20,
+                  fontFamily: config.fonts.HeadingFont,
+                  fontSize: 20,
+                  color: config.colors.blackColor,
+                  lineHeight: 23,
+                }}>{`You Are`}</Text>
+              <View
+                style={{
+                  height: 200,
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                  backgroundColor: config.colors.white,
+                }}>
+                <TouchableOpacity
+                  style={{
+                    height: 190,
+                    width: '45%',
+                    borderRadius: 16,
+                    borderWidth: 1,
+                    borderColor:
+                      selectedUser == 'guest'
+                        ? config.colors.primaryColor
+                        : config.colors.lightGreyColor,
+                    backgroundColor: config.colors.white,
+                  }}
+                  onPress={() => {
+                    setSelectedUser('guest');
+                    AsyncStorage.setItem(
+                      config.AsyncKeys.USER_ROLE,
+                      JSON.stringify('guest'),
+                    );
+                  }}>
+                  <Image
+                    source={
+                      selectedUser == 'guest'
+                        ? config.images.CHECK_ICON
+                        : config.images.UNCHECK_ICON
+                    }
+                    style={{
+                      height: 20,
+                      width: 20,
+                      resizeMode: 'cover',
+                      marginTop: 15,
+                      tintColor:
+                        selectedUser == 'guest'
+                          ? config.colors.primaryColor
+                          : config.colors.lightGreyColor,
+                      alignSelf: 'flex-end',
+                      marginRight: 15,
+                    }}
+                  />
+
+                  <Image
+                    source={config.images.GUEST_IMG}
+                    style={{
+                      height: 42,
+                      width: 42,
+                      resizeMode: 'cover',
+                      marginTop: 15,
+                      marginLeft: 10,
+                    }}
+                  />
+                  <Text
+                    style={{
+                      marginLeft: 10,
+                      marginVertical: 10,
+                      fontFamily: config.fonts.HeadingFont,
+                      fontSize: 16,
+                      color: config.colors.blackColor,
+                      lineHeight: 18,
+                    }}>{`A Guest`}</Text>
+                  <Text
+                    style={{
+                      marginLeft: 10,
+                      fontFamily: config.fonts.PrimaryFont,
+                      fontSize: 14,
+                      lineHeight: 16,
+                      color: config.colors.lightGrey2Color,
+                    }}>{`Experience \nSaudi with a \nLocal`}</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={{
+                    height: 190,
+                    width: '45%',
+                    borderRadius: 16,
+                    borderWidth: 1,
+                    borderColor:
+                      selectedUser == 'local'
+                        ? config.colors.primaryColor
+                        : config.colors.lightGreyColor,
+                    backgroundColor: config.colors.white,
+                  }}
+                  onPress={() => {
+                    setSelectedUser('local');
+                    AsyncStorage.setItem(
+                      config.AsyncKeys.USER_ROLE,
+                      JSON.stringify('local'),
+                    );
+                  }}>
+                  <Image
+                    source={
+                      selectedUser == 'local'
+                        ? config.images.CHECK_ICON
+                        : config.images.UNCHECK_ICON
+                    }
+                    style={{
+                      height: 20,
+                      width: 20,
+                      resizeMode: 'cover',
+                      marginTop: 15,
+                      tintColor:
+                        selectedUser == 'local'
+                          ? config.colors.primaryColor
+                          : config.colors.lightGreyColor,
+                      alignSelf: 'flex-end',
+                      marginRight: 15,
+                    }}
+                  />
+
+                  <Image
+                    source={config.images.LOCAL_IMG}
+                    style={{
+                      height: 42,
+                      width: 42,
+                      resizeMode: 'cover',
+                      marginTop: 15,
+                      marginLeft: 10,
+                    }}
+                  />
+                  <Text
+                    style={{
+                      marginLeft: 10,
+                      marginVertical: 10,
+                      fontFamily: config.fonts.HeadingFont,
+                      fontSize: 16,
+                      color: config.colors.blackColor,
+                      lineHeight: 18,
+                    }}>{`A Local`}</Text>
+                  <Text
+                    style={{
+                      marginLeft: 10,
+                      fontFamily: config.fonts.PrimaryFont,
+                      fontSize: 14,
+                      lineHeight: 16,
+                      color: config.colors.lightGrey2Color,
+                    }}>{`Guide your \nGuests the \nSaudi Way`}</Text>
+                </TouchableOpacity>
+              </View>
+              <AppButton
+                text={'Continue'}
+                textStyle={{fontSize: 16}}
+                onPress={() => {
+                  if (selectedUser == '') {
+                    Toast.show({
+                      type: 'custom',
+                      text1: 'Please select a user to continue',
+                      position: 'top',
+                    });
+                  } else {
+                    if (selectedUser == 'Local') {
+                      setSelectUserModal(false);
+                    } else {
+                      setSelectUserModal(false);
+                    }
+                  }
+                }}
+                buttonStyle={{marginVertical: 20}}
+              />
+            </ScrollView>
+          </View>
+        </TouchableOpacity>
+      </Modal>
     );
   };
 
@@ -534,6 +758,7 @@ const UserLoginScreen = ({navigation, route}) => {
       </View>
       {/* </ScrollView> */}
       {CountryCodeModal()}
+      {SelectUserModalView()}
     </SafeAreaView>
   );
 };
