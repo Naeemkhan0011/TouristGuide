@@ -358,7 +358,7 @@ const GuideCompleteProfile = ({navigation}) => {
             />
           </View>
 
-          <TouchableOpacity
+          <View
             style={{
               marginTop: 15,
               flexDirection: 'row',
@@ -372,7 +372,7 @@ const GuideCompleteProfile = ({navigation}) => {
                 lineHeight: 18,
                 color: config.colors.blackColor,
               }}>{`Select Activities`}</Text>
-            <Image
+            {/* <Image
               source={config.images.RIGHT_ARROW}
               style={{
                 height: 20,
@@ -380,8 +380,8 @@ const GuideCompleteProfile = ({navigation}) => {
                 resizeMode: 'contain',
                 transform: [{rotate: activityDropDown ? '-90deg' : '90deg'}],
               }}
-            />
-          </TouchableOpacity>
+            /> */}
+          </View>
           {/* {activityDropDown && (
             <> */}
               <TouchableOpacity

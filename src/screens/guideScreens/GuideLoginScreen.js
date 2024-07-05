@@ -364,43 +364,7 @@ const GuideLoginScreen = ({navigation, route}) => {
             }
           />
         </View>
-         {password?.length > 0 && (
-          <View style={{
-            height:100,
-            paddingHorizontal:8,
-            paddingVertical:6,
-            width: '100%',
-            borderWidth:1,
-            borderRadius:12,
-            borderColor: (test1 && test2 && test3) ? config.colors.greenColor : config.colors.red
-          }}>
-            <Text style={{
-              marginTop:7,
-              fontFamily: config.fonts.MediumFont,
-              fontSize:17,
-              lineHeight:21,
-              color:config.colors.blackColor
-            }}>{`Your password needs to:`}</Text>
-            <Text style={{
-              fontFamily: config.fonts.PrimaryFont,
-              fontSize:14,
-              lineHeight:18,
-              color:test1 ? config.colors.greenColor : config.colors.red
-            }}>{test1 ? '✔' : 'X'} {` include both lower and upper case characters.`}</Text>
-            <Text style={{
-              fontFamily: config.fonts.PrimaryFont,
-              fontSize:14,
-              lineHeight:18,
-              color:test2 ? config.colors.greenColor : config.colors.red
-            }}>{test2 ? '✔' : 'X'}{` include at least one number or symbol.`}</Text>
-            <Text style={{  
-              fontFamily: config.fonts.PrimaryFont,
-              fontSize:14,
-              lineHeight:18,
-              color:test3 ? config.colors.greenColor : config.colors.red
-            }}>{test3 ? '✔' : 'X'}{` be at least 8 characters long.`}</Text>
-          </View>
-        )}
+      
 
         <View
           style={{
