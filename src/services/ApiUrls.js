@@ -18,6 +18,9 @@ const BASE_API_URL =
   USER_REVIEW_DETAIL_URL: `${BASE_API_URL}user/reviewsDetails`,
   USER_TRIP_MEMORIES_COUNT_URL: `${BASE_API_URL}user/getTripMemoriesCount`,
   USER_GET_PROFILE_DETAIL_URL: `${BASE_API_URL}user/getProfileDetails`,
+  USER_GET_ACTIVITIES_URL: `${BASE_API_URL}user/ActivityList`,
+  USER_TRIP_DETAILS_URL: `${BASE_API_URL}user/tripDetails`,
+  USER_GUIDE_DETAIL_URL: `${BASE_API_URL}user/getProfileDetails`,
   
   /*--------------- GUIDE API URLS --------------*/
   GUIDE_GET_PROFILE_URL: `${BASE_API_URL}guide/getProfileDetails`,

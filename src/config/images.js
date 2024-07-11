@@ -74,4 +74,5 @@ export default {
     BOATING_ICON: require('../assets/images/boating.png'),
     BONFIRE_ICON: require('../assets/images/bonfire.png'),
     WILDLIFE_ICON: require('../assets/images/wildlife.png'),
+    DELETE_ICON: require('../assets/images/delete.png'),
 }

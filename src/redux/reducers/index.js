@@ -15,6 +15,9 @@ import * as UserFilterApiReducer from './UserReducer/UserFilterApiReducer';
 import * as UserCreateTripReducer from './UserReducer/UserCreateTripReducer';
 import * as UserTripMemoriesCountReducer from './UserReducer/UserTripMemoriesCountReducer';
 import * as UserGetTripListReducer from './UserReducer/UserGetTripListReducer';
+import * as USerGetActivitiesReducer from './UserReducer/UserGetActivitiesReducer';
+import * as UserTripDetailReducer from './UserReducer/UserTripDetailReducer';
+import * as UserGuideDetailReducer from './UserReducer/UserGuideReducer';
 
 /*------------- GUIDE --------------- */
 import * as GuideGetProfileReducer from './GuideReducer/GuideGetProfileReducer';
@@ -39,6 +42,9 @@ const reducers = combineReducers({
   UserCreateTripReducer:UserCreateTripReducer.UserCreateTripSliceReducer,
   UserTripMemoriesCountReducer:UserTripMemoriesCountReducer.UserTripMemoriesCountSliceReducer,
   UserGetTripListReducer:UserGetTripListReducer.UserGetTripListSliceReducer,
+  USerGetActivitiesReducer:USerGetActivitiesReducer.USerGetActivitiesSliceReducer,
+  UserTripDetailReducer:UserTripDetailReducer.UserTripDetailSliceReducer,
+  UserGuideDetailReducer:UserGuideDetailReducer.UserGuideDetailSliceReducer,
 
   /* ------------------- GUIDE -------------- */
   GuideGetProfileReducer:GuideGetProfileReducer.GuideGetProfileSliceReducer,
@@ -64,6 +70,9 @@ export {
   UserCreateTripReducer,
   UserTripMemoriesCountReducer,
   UserGetTripListReducer,
+  USerGetActivitiesReducer,
+  UserTripDetailReducer,
+  UserGuideDetailReducer,
   /* ------------------- GUIDE -------------- */
   GuideGetProfileReducer,
   GuidePayStatusReducer,

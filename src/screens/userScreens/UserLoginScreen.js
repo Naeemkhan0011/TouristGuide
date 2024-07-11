@@ -36,7 +36,7 @@ const UserLoginScreen = ({navigation, route}) => {
   const [password, setPassword] = useState('');
   const [checkBoxSelected, setCheckBoxSelected] = useState(false);
   const [showCountryCode, setShowCountryCode] = useState(false);
-  const [countryCode, setCountryCode] = useState('');
+  const [countryCode, setCountryCode] = useState('+91');
   const [countryFlag, setCountryFlag] = useState('');
   const [test1, setTest1] = useState('');
   const [test2, setTest2] = useState('');
@@ -504,7 +504,7 @@ const UserLoginScreen = ({navigation, route}) => {
               <Text
                 style={{
                   marginHorizontal: 6,
-                  fontFamily: config.fonts.MediumFont,
+                  fontFamily: config.fonts.LatoRegularFont,
                   fontSize: 14,
                   lineHeight: 16,
                   color: config.colors.lightGrey2Color,

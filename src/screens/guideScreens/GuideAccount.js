@@ -47,7 +47,7 @@ const GuideAccount = ({navigation}) => {
     AsyncStorage.removeItem(config.AsyncKeys.USER_DATA);
     AsyncStorage.removeItem(config.AsyncKeys.USER_TOKEN);
 
-    goToTopNavigation(config.routes.LANGUAGE);
+    goToTopNavigation(config.routes.ONBOARDING);
   }, 100);
 
   return ()=> clearTimeout(subscribe)

@@ -709,7 +709,8 @@ const GuideSignupScreen = ({navigation, route}) => {
         {isFocused && (
           <View
             style={{
-              height: 100,
+              // height: 100,
+              paddingVertical:12,
               paddingHorizontal: 8,
               paddingVertical: 6,
               width: '100%',
@@ -842,7 +843,8 @@ const GuideSignupScreen = ({navigation, route}) => {
         {isFocused1 && (
           <View
             style={{
-              height: 100,
+              // height: 100,
+              paddingVertical:12,
               paddingHorizontal: 8,
               paddingVertical: 6,
               width: '100%',

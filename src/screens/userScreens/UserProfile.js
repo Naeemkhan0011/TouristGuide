@@ -32,7 +32,7 @@ const UserProfile = ({navigation}) => {
     AsyncStorage.removeItem(config.AsyncKeys.USER_DATA);
     AsyncStorage.removeItem(config.AsyncKeys.USER_TOKEN);
 
-    goToTopNavigation(config.routes.USER_LOGIN_SCREEN,{from:'logout'});
+    goToTopNavigation(config.routes.ONBOARDING,{from:'logout'});
   }, 100);
 
   return ()=> clearTimeout(subscribe)

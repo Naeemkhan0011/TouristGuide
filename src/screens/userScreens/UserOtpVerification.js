@@ -88,9 +88,14 @@ const UserOtpVerification = ({navigation, route}) => {
             code: route?.params?.code,
           });
         }
-        goToTopNavigation(config.routes.TAB_NAVIGATOR, {
-          userRole: route?.params?.userRole,
+        navigation.navigate(config.routes.USER_ACCOUNT_SUCCESS, {
+          token: userOtpVerifyResponse?.results?.token,
+          userData: userOtpVerifyResponse?.results?.user,
+          type: 'guest',
         });
+        // goToTopNavigation(config.routes.TAB_NAVIGATOR, {
+        //   userRole: route?.params?.userRole,
+        // });
 
         AsyncStorage.setItem(
           config.AsyncKeys.USER_LOGGED_IN,

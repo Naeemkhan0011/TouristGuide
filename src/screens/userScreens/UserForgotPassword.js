@@ -196,7 +196,7 @@ const UserForgotPassword = ({navigation}) => {
               <Text
                 style={{
                   marginHorizontal: 6,
-                  fontFamily: config.fonts.MediumFont,
+                  fontFamily: config.fonts.LatoRegularFont,
                   fontSize: 14,
                   lineHeight: 16,
                   color: config.colors.lightGrey2Color,

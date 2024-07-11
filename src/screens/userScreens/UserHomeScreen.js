@@ -25,12 +25,15 @@ import {
   UserOffRoadTripReducer,
   UserRoadTripReducer,
 } from "../../redux/reducers";
+import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFocusEffect } from "@react-navigation/native";
 import { SagaActions } from "../../redux/sagas/SagaActions";
 import Slider from "@react-native-community/slider";
 import { debounce } from "lodash";
 import Toast from "react-native-toast-message";
+
+const Tab = createMaterialTopTabNavigator();
 
 const UserHomeScreen = () => {
   const dispatch = useDispatch();
@@ -62,8 +65,8 @@ const UserHomeScreen = () => {
   const [userId, setUserId] = useState("");
   const [sliderValue, setSliderValue] = useState(55);
   const [filterModalVisible, setFilterModalVisible] = useState(false);
-  const [gender, setGender] = useState("Male");
-  const [selectActivity, setSelectActivity] = useState("All");
+  const [gender, setGender] = useState("");
+  const [selectActivity, setSelectActivity] = useState("");
   const [selectSpatialCare, setSelectSpatialCare] = useState("");
   const [renderSwitch, setRenderSwitch] = useState(true);
 
@@ -251,7 +254,7 @@ const UserHomeScreen = () => {
     dispatch({ type: SagaActions.USER_OFF_ROAD_TRIP, payload });
   };
 
-  const popularCity = () => {
+  const PopularCity = () => {
     return (
       <ScrollView
         showsVerticalScrollIndicator={false}
@@ -408,7 +411,7 @@ const UserHomeScreen = () => {
     );
   };
 
-  const roadTrip = () => {
+  const RoadTrip = () => {
     return (
       <ScrollView
         showsVerticalScrollIndicator={false}
@@ -871,7 +874,7 @@ const UserHomeScreen = () => {
     );
   };
 
-  const offSiteTrip = () => {
+  const OffSiteTrip = () => {
     return (
       <ScrollView
         showsVerticalScrollIndicator={false}
@@ -1056,9 +1059,9 @@ const UserHomeScreen = () => {
           barStyle="light-content"
           backgroundColor="rgba(60, 61, 62, 0.8)"
         />
-        <View
+        <TouchableOpacity
           // activeOpacity={0.8}
-          // onPress={() => setSelectUserModal(false)}
+          onPress={() => setFilterModalVisible(false)}
           style={{
             flex: 1,
             width: `100%`,
@@ -1315,7 +1318,7 @@ const UserHomeScreen = () => {
                   // marginTop: 15,
                 }}
               >
-                <TouchableOpacity
+                {/* <TouchableOpacity
                   style={{
                     marginVertical: 8,
                     flexDirection: "row",
@@ -1347,7 +1350,7 @@ const UserHomeScreen = () => {
                           : config.colors.yellowColor,
                     }}
                   >{`All`}</Text>
-                </TouchableOpacity>
+                </TouchableOpacity> */}
 
                 <TouchableOpacity
                   style={{
@@ -1811,7 +1814,13 @@ const UserHomeScreen = () => {
                     justifyContent: "center",
                   }}
                   onPress={() => {
-                    setFilterModalVisible(false);
+                    // setFilterModalVisible(false);
+                    setGender(''),
+                    setSelectActivity(''),
+                   setRenderSwitch(false),
+                   setSelectSpatialCare('')
+                   
+                  
                   }}
                 >
                   <Text
@@ -1848,7 +1857,7 @@ const UserHomeScreen = () => {
               </View>
             </ScrollView>
           </View>
-        </View>
+        </TouchableOpacity>
       </Modal>
     );
   };
@@ -1987,7 +1996,7 @@ const UserHomeScreen = () => {
           />
         </TouchableOpacity>
       </View>
-      <View
+      {/* <View
         style={{
           marginTop: 10,
           height: 45,
@@ -2084,9 +2093,156 @@ const UserHomeScreen = () => {
             }}
           >{`Off- Road Trip`}</Text>
         </TouchableOpacity>
-      </View>
+      </View> */}
 
-      <View
+      <>
+      <Tab.Navigator 
+      initialRouteName={'Popular'}
+      screenOptions={{
+        tabBarStyle: {
+          marginTop:12,
+          height: Platform.OS == 'android' ? 68 : 88,
+          borderRadius: 10,
+          backgroundColor: config.colors.primaryColor,
+          // bottom: 20,
+          // marginHorizontal: 20,
+        },
+        headerShown: false,
+        tabBarShowLabel: true,
+        tabBarLabelStyle:
+         {
+          fontSize: 13,
+          color: config.colors.white,
+          fontFamily: config.fonts.MediumFont,
+          lineHeight:16
+        }
+      }}
+      >
+      <Tab.Screen 
+      name="Popular" 
+      component={PopularCity} 
+      options={{
+        tabBarLabel: 'Popular Trip',
+        tabBarIcon: ({color, size, focused}) => (
+          <View style={{
+            height:75,
+            width:'100%',
+            
+          }}>
+           
+              <Image
+                source={config.images.POPULAR_TRIP}
+                style={{
+                  marginLeft:4,
+                  height: 23,
+                  width: 23,
+                  resizeMode: 'contain',
+                  tintColor: focused
+                    ? config.colors.white
+                    : config.colors.lightGrey2Color,
+                }}
+              />
+              {/* <Text
+                style={{
+                  fontFamily: config.fonts.MediumFont,
+                  fontSize: 13,
+                  lineHeight: 26,
+                  // marginLeft: 6,
+                  color: focused
+                    ? config.colors.white
+                    : config.colors.lightGrey2Color,
+                  justifyContent: 'center',
+                }}>
+                {'Popular Trip'}
+              </Text> */}
+            </View>
+           ),
+          }}
+      />
+      <Tab.Screen 
+      name="RoadTrip" 
+      component={RoadTrip}
+      options={{
+        tabBarLabel: 'RoadTrip',
+        tabBarIcon: ({color, size, focused}) => (
+          <View style={{
+            height:45,
+            width:'32%'
+          }}>
+           
+              <Image
+                source={config.images.ROAD_TRIP}
+                style={{
+                  marginLeft:4,
+                  height: 23,
+                  width: 23,
+                  resizeMode: 'contain',
+                  tintColor: focused
+                    ? config.colors.white
+                    : config.colors.lightGrey2Color,
+                }}
+              />
+              {/* <Text
+                style={{
+                  fontFamily: config.fonts.MediumFont,
+                  fontSize: 13,
+                  lineHeight: 26,
+                  // marginLeft: 6,
+                  color: focused
+                    ? config.colors.white
+                    : config.colors.lightGrey2Color,
+                  justifyContent: 'center',
+                }}>
+                {'Road Trip'}
+              </Text> */}
+            </View>
+           ),
+          }}
+      
+      />
+      <Tab.Screen 
+      name="offRoadTrip" 
+      component={OffSiteTrip}
+      options={{
+        tabBarLabel: 'offRoadTrip',
+        tabBarIcon: ({color, size, focused}) => (
+          <View style={{
+            height:45,
+            width:'32%',
+            }}>
+           
+              <Image
+                source={config.images.OFF_SITE_TRIP}
+                style={{
+                  marginLeft:4,
+                  height: 20,
+                  width: 20,
+                  resizeMode: 'cover',
+                  tintColor: focused
+                    ? config.colors.white
+                    : config.colors.lightGrey2Color,
+                }}
+              />
+              {/* <Text
+                style={{
+                  fontFamily: config.fonts.MediumFont,
+                  fontSize: 13,
+                  lineHeight: 26,
+                  // marginLeft: 6,
+                  color: focused
+                    ? config.colors.white
+                    : config.colors.lightGrey2Color,
+                }}>
+                {'Off- Road Trip'}
+              </Text> */}
+          </View>
+           ),
+          }}
+      />
+    </Tab.Navigator>
+      </>
+
+      {/* <View
         style={{
           marginTop: 10,
           flex: 1,
@@ -2102,7 +2258,7 @@ const UserHomeScreen = () => {
           : trip == "Off- Road Trip"
           ? offSiteTrip()
           : null}
-      </View>
+      </View> */}
       {filterShowModal()}
     </SafeAreaView>
   );

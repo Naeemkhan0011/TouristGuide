@@ -1,52 +1,54 @@
-import * as React from 'react';
-import {View, Text, Platform} from 'react-native';
-import {NavigationContainer} from '@react-navigation/native';
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import config from '../config';
+import * as React from "react";
+import { View, Text, Platform } from "react-native";
+import { NavigationContainer } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import config from "../config";
 
-import AuthNavigation from './AuthNavigation';
+import AuthNavigation from "./AuthNavigation";
 
-import {navigationRef} from '../components/NavigationRef';
-import PushController from '../components/PushController';
-import PushControllerIos from '../components/PushControllerIos';
-import Language from '../screens/language/Language';
-import Onboarding from '../screens/onboarding/Onboarding';
-import SelectUser from '../screens/selectUser/SelectUser';
-import WelcomeScreen from '../screens/welcomeScreen/WelcomeScreen';
-import UserSignupScreen from '../screens/userScreens/UserSignupScreen';
-import UserLoginScreen from '../screens/userScreens/UserLoginScreen';
-import UserForgotPassword from '../screens/userScreens/UserForgotPassword';
-import UserOtpVerification from '../screens/userScreens/UserOtpVerification';
-import GuideLoginScreen from '../screens/guideScreens/GuideLoginScreen';
-import GuideForgotPassword from '../screens/guideScreens/GuideForgotPassword';
-import GuideOtpVerification from '../screens/guideScreens/GuideOtpVerification';
-import GuideSignupScreen from '../screens/guideScreens/GuideSignupScreen';
-import UserHomeScreen from '../screens/userScreens/UserHomeScreen';
-import MyTrip from '../screens/userScreens/MyTrip';
-import GuideHomeScreen from '../screens/guideScreens/GuideHomeScreen';
-import GuideAccount from '../screens/guideScreens/GuideAccount';
-import TabNavigator from './TabNavigation';
-import UserProfile from '../screens/userScreens/UserProfile';
-import UserFavorite from '../screens/userScreens/UserFavorite';
-import UserUpdatePassword from '../screens/userScreens/UserUpdatePassword';
-import MyPackage from '../screens/guideScreens/MyPackage';
-import AccountSuccess from '../screens/guideScreens/AccountSuccess';
-import UserAccountSuccess from '../screens/userScreens/UserAccountSuccess';
-import UserCreateTrip from '../screens/userScreens/UserCreateTrip';
-import SubscriptionPlan from '../screens/guideScreens/SubscriptionPlan';
-import ChoosePaymentMethod from '../screens/guideScreens/Payment/ChoosePaymentMethod';
-import PaymentDetail from '../screens/guideScreens/Payment/PaymentDetail';
-import GuideCompleteProfile from '../screens/guideScreens/GuideCompleteProfile';
-import GuideEditProfile from '../screens/guideScreens/GuideEditProfile';
-import UserEditProfile from '../screens/userScreens/UserEditProfile';
+import { navigationRef } from "../components/NavigationRef";
+import PushController from "../components/PushController";
+import PushControllerIos from "../components/PushControllerIos";
+import Language from "../screens/language/Language";
+import Onboarding from "../screens/onboarding/Onboarding";
+import SelectUser from "../screens/selectUser/SelectUser";
+import WelcomeScreen from "../screens/welcomeScreen/WelcomeScreen";
+import UserSignupScreen from "../screens/userScreens/UserSignupScreen";
+import UserLoginScreen from "../screens/userScreens/UserLoginScreen";
+import UserForgotPassword from "../screens/userScreens/UserForgotPassword";
+import UserOtpVerification from "../screens/userScreens/UserOtpVerification";
+import GuideLoginScreen from "../screens/guideScreens/GuideLoginScreen";
+import GuideForgotPassword from "../screens/guideScreens/GuideForgotPassword";
+import GuideOtpVerification from "../screens/guideScreens/GuideOtpVerification";
+import GuideSignupScreen from "../screens/guideScreens/GuideSignupScreen";
+import UserHomeScreen from "../screens/userScreens/UserHomeScreen";
+import MyTrip from "../screens/userScreens/MyTrip";
+import GuideHomeScreen from "../screens/guideScreens/GuideHomeScreen";
+import GuideAccount from "../screens/guideScreens/GuideAccount";
+import TabNavigator from "./TabNavigation";
+import UserProfile from "../screens/userScreens/UserProfile";
+import UserFavorite from "../screens/userScreens/UserFavorite";
+import UserUpdatePassword from "../screens/userScreens/UserUpdatePassword";
+import MyPackage from "../screens/guideScreens/MyPackage";
+import AccountSuccess from "../screens/guideScreens/AccountSuccess";
+import UserAccountSuccess from "../screens/userScreens/UserAccountSuccess";
+import UserCreateTrip from "../screens/userScreens/UserCreateTrip";
+import SubscriptionPlan from "../screens/guideScreens/SubscriptionPlan";
+import ChoosePaymentMethod from "../screens/guideScreens/Payment/ChoosePaymentMethod";
+import PaymentDetail from "../screens/guideScreens/Payment/PaymentDetail";
+import GuideCompleteProfile from "../screens/guideScreens/GuideCompleteProfile";
+import GuideEditProfile from "../screens/guideScreens/GuideEditProfile";
+import UserEditProfile from "../screens/userScreens/UserEditProfile";
+import UserTripDetail from "../screens/userScreens/UserTripDetail";
+import GuideDetails from "../screens/userScreens/GuideDetails";
 
 const Stack = createNativeStackNavigator();
 
 function RootNavigation() {
   return (
     <NavigationContainer ref={navigationRef}>
-      <Stack.Navigator screenOptions={{headerShown: false}}>
-        {Platform.OS == 'android' ? (
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
+        {Platform.OS == "android" ? (
           <Stack.Screen name="PushController" component={PushController} />
         ) : (
           <Stack.Screen
@@ -183,6 +185,16 @@ function RootNavigation() {
         <Stack.Screen
           name={config.routes.USER_EDIT_PROFILE}
           component={UserEditProfile}
+        />
+
+        <Stack.Screen
+          name={config.routes.USER_TRIP_DETAIL}
+          component={UserTripDetail}
+        />
+
+        <Stack.Screen
+          name={config.routes.GUIDE_DETAIL}
+          component={GuideDetails}
         />
 
         <Stack.Screen name={config.routes.MY_PACKAGE} component={MyPackage} />

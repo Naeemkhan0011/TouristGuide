@@ -9,22 +9,27 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import config from "../../config";
 import AppTextInput from "../../components/AppTextInput";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import AppButton from "../../components/AppButton";
 import { useDispatch, useSelector } from "react-redux";
 import {
+  USerGetActivitiesReducer,
   UserCreateTripReducer,
   UserGetProfileReducer,
 } from "../../redux/reducers";
 import Toast from "react-native-toast-message";
 import { SagaActions } from "../../redux/sagas/SagaActions";
 import moment from "moment";
+import { useFocusEffect } from "@react-navigation/native";
 
 const UserCreateTrip = ({ navigation }) => {
   const dispatch = useDispatch();
+  const userGetActivitiesResponse = useSelector(
+    USerGetActivitiesReducer.selectUSerGetActivitiesData
+  );
   const userCreateTripResponse = useSelector(
     UserCreateTripReducer.selectUserCreateTripData
   );
@@ -35,7 +40,13 @@ const UserCreateTrip = ({ navigation }) => {
     UserGetProfileReducer.selectUserGetProfileData
   );
   const [numberOfGuest, setNumberOfGuest] = useState("");
-  const [destination, setDestination] = useState([{ id: 1, value: "" }]);
+  const [destination, setDestination] = useState([
+    {
+      destination: "",
+      startDate: "",
+      endDate: "",
+    },
+  ]);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [writeNotes, setWriteNotes] = useState("");
@@ -44,12 +55,18 @@ const UserCreateTrip = ({ navigation }) => {
   const [inputCount, setInputCount] = useState(1);
   const [selectSpatialCare, setSelectSpatialCare] = useState([]);
   const [toggle, setToggle] = useState(false);
+  const [index, setIndex] = useState("");
   const [showStartDate, setShowStartDate] = useState(false);
   const [showEndDate, setShowEndDate] = useState(false);
   const [selectAll, setSelectAll] = useState(false);
   const isAllSelected = activities.length == 5;
-  console.log("isAllSelected", isAllSelected);
-  console.log("activities", activities, activities.length);
+  console.log(
+    "destination",
+    destination,
+    destination?.startDate,
+    destination?.endDate
+  );
+  console.log("show date", showStartDate, showEndDate);
   const activitiesList = [
     "Camping",
     "Wildlife Viewing",
@@ -73,14 +90,21 @@ const UserCreateTrip = ({ navigation }) => {
           type: "custom",
           text1: userCreateTripResponse?.message,
         });
-        setDestination(''),
-          setStartDate(''),
-          setEndDate(''),
-          setNumberOfGuest(''),
-          setActivities(''),
-          setSelectSpatialCare(''),
-          setWriteNotes(''),
-          navigation.goBack();
+        setDestination([
+          {
+            destination: "",
+            startDate: "",
+            endDate: "",
+          },
+        ]),
+          setStartDate(""),
+          setEndDate(""),
+          setNumberOfGuest(""),
+          setActivities([]),
+          setSelectSpatialCare([]),
+          setWriteNotes(""),
+          setToggle(false);
+        navigation.goBack();
         console.log("userCreateTripResponse", userCreateTripResponse);
         dispatch(UserCreateTripReducer.removeUserCreateTripResponse());
       }
@@ -97,6 +121,20 @@ const UserCreateTrip = ({ navigation }) => {
       }
     }
   }, [userCreateTripErrorResponse]);
+
+  useEffect(() => {
+    if (userGetActivitiesResponse != null) {
+      if (userGetActivitiesResponse?.error == false) {
+        console.log("userGetActivitiesResponse", userGetActivitiesResponse);
+      }
+    }
+  }, [userGetActivitiesResponse]);
+
+  useFocusEffect(
+    useCallback(() => {
+      userGetActivityApi()
+    },[])
+  )
 
   //function call
 
@@ -134,36 +172,79 @@ const UserCreateTrip = ({ navigation }) => {
   };
 
   const today = new Date();
+  const date1 = new Date(startDate);
+  const date2 = new Date(endDate);
 
-  const handleConfirm = (date) => {
-    console.warn("A date has been picked: ", date);
+  const handleStartDatePickerConfirm = (date) => {
+    handleStartDateChange(index, date);
     setShowStartDate(false);
-    setTimeout(() => {
-      setStartDate(moment(date).format("YYYY-MM-DD"));
-    }, 100);
   };
 
-  const handleEndDateConfirm = (date) => {
-    console.warn("A date has been picked: ", date);
+  const handleEndDatePickerConfirm = (date) => {
+    handleEndDateChange(index, date);
     setShowEndDate(false);
-    setTimeout(() => {
-      setEndDate(moment(date).format("YYYY-MM-DD"));
-    }, 100);
-  };
-  const addInput = () => {
-    setDestination([...destination, { id: inputCount + 1, value: "" }]);
-    setInputCount(inputCount + 1);
   };
 
-  const handleInputChange = (text, id) => {
-    const newInputs = destination.map((input) => {
-      if (input.id === id) {
-        return { ...input, value: text };
-      }
-      return input;
-    });
+  const handleAddInput = () => {
+    const lastInput = destination[destination.length - 1];
+    if (lastInput?.text !== "") {
+      setDestination([
+        ...destination,
+        {
+          destination: "",
+          startDate: "",
+          endDate: "",
+        },
+      ]);
+    }
+  };
+  const handleDeleteInput = (index) => {
+    const newInputs = [...destination];
+    newInputs.splice(index, 1);
     setDestination(newInputs);
   };
+  const handleTextChange = (index, text) => {
+    const newInputs = [...destination];
+    newInputs[index].destination = text;
+    setDestination(newInputs);
+  };
+  const handleStartDateChange = (index, date) => {
+    setShowStartDate(false);
+    console.log("dates", destination, date);
+    const newInputs = [...destination];
+    console.log("newInputs", newInputs, index);
+    newInputs[index].startDate = moment(date).format("YYYY-MM-DD");
+    setDestination(newInputs);
+  };
+  const handleEndDateChange = (index, date) => {
+    setShowEndDate(false);
+    console.log("end date", destination);
+    const newInputs = [...destination];
+    newInputs[index].endDate = moment(date).format("YYYY-MM-DD");
+    console.log("newInputs", newInputs), index;
+    if (newInputs[index].startDate > newInputs[index].endDate) {
+      Toast.show({
+        type: "custom",
+        text1: "Start date should be less than end date",
+      });
+    }
+
+    setDestination(newInputs);
+  };
+  // const addInput = () => {
+  //   setDestination([...destination, { id: inputCount + 1, value: "" }]);
+  //   setInputCount(inputCount + 1);
+  // };
+
+  // const handleInputChange = (text, id) => {
+  //   const newInputs = destination?.map((input) => {
+  //     if (input.id === id) {
+  //       return { ...input, value: text };
+  //     }
+  //     return input;
+  //   });
+  //   setDestination(newInputs);
+  // };
 
   const handleStartDateCancel = () => {
     setShowStartDate(false);
@@ -177,7 +258,11 @@ const UserCreateTrip = ({ navigation }) => {
       <DateTimePickerModal
         isVisible={showStartDate}
         mode="date"
-        onConfirm={handleConfirm}
+        onConfirm={handleStartDatePickerConfirm}
+        // onChange={(date) => {
+        //   handleStartDatePickerConfirm(date,index)
+        //   alert(date,index)
+        // }}
         onCancel={handleStartDateCancel}
         minimumDate={today}
       />
@@ -189,7 +274,11 @@ const UserCreateTrip = ({ navigation }) => {
       <DateTimePickerModal
         isVisible={showEndDate}
         mode="date"
-        onConfirm={handleEndDateConfirm}
+        onConfirm={handleEndDatePickerConfirm}
+        // onChange={(date) => {
+        //   handleEndDatePickerConfirm(date,index)
+        //   alert(date,index)
+        // }}
         onCancel={handleEndDateCancel}
         minimumDate={today}
       />
@@ -197,17 +286,63 @@ const UserCreateTrip = ({ navigation }) => {
   };
 
   // api call
+  const userGetActivityApi = () => {
+    dispatch({type:SagaActions.USER_GET_ACTIVITIES, payload:''})
+  }
 
+  // const trip = destination?.map((item) => item?.value);
   const callUserCreateTripApi = () => {
-    const payload = {
-      Destination: destination,
-      startDate: startDate,
-      endDate: endDate,
+    if (date1 > date2) {
+      return Toast.show({
+        type: "custom",
+        text1: "start date should be less than end date",
+      });
+    }
+    if (numberOfGuest == "") {
+      return Toast.show({
+        type: "custom",
+        text1: "Please enter guest count",
+      });
+    }
+
+    if (writeNotes == "") {
+      return Toast.show({
+        type: "custom",
+        text1: "Please enter notes",
+      });
+    }
+
+    if (activities.length == 0) {
+      return Toast.show({
+        type: "custom",
+        text1: "Please select activities",
+      });
+    }
+
+    if (selectSpatialCare.length == 0) {
+      return Toast.show({
+        type: "custom",
+        text1: "Please select special care",
+      });
+    }
+
+    if (toggle == false) {
+      return Toast.show({
+        type: "custom",
+        text1: "Please agree Terms of service & privacy policy",
+      });
+    }
+
+    let payload = {
+      destinations: destination,
+      // startDate: startDate,
+      // endDate: endDate,
       noGuest: numberOfGuest,
       activities: activities,
       needs: selectSpatialCare,
       notes: writeNotes,
     };
+
     dispatch({ type: SagaActions.USER_CREATE_TRIP, payload });
   };
 
@@ -280,7 +415,7 @@ const UserCreateTrip = ({ navigation }) => {
         />
       </View> */}
 
-        {destination.map((input, index) => (
+        {destination?.map((input, index) => (
           <View
             style={{
               marginTop: 12,
@@ -288,24 +423,105 @@ const UserCreateTrip = ({ navigation }) => {
             key={index}
           >
             <AppTextInput
+              rightIcon={index > 0 && config.images.DELETE_ICON}
+              rightIconPress={() => {
+                handleDeleteInput();
+              }}
               placeholder="Enter Destination"
               keyboardType={"default"}
-              onChangeText={(text) => handleInputChange(text, input.id)}
+              onChangeText={(text) => handleTextChange(index, text)}
               value={input?.value}
               leftIconStyle={{ height: 20, width: 20, resizeMode: "contain" }}
               leftIcon={config.images.LOCATION1}
             />
-            {/* <TextInput
-              style={styles.input}
-              placeholder={`Enter Destination ${index + 1}`}
-              keyboardType="default"
-              onChangeText={text => handleInputChange(text, input.id)}
-              value={input.value}
-            /> */}
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                width: "100%",
+              }}
+            >
+              <View
+                style={{
+                  height: 50,
+                  marginTop: 15,
+                  borderRadius: 12,
+                  flexDirection: "row",
+                  // justifyContent:',
+                  alignItems: "center",
+                  width: "45%",
+                  borderWidth: 1,
+                  borderColor: config.colors.lightGreyColor,
+                }}
+              >
+                <Image
+                  source={config.images.CALENDAR_ICON}
+                  style={{
+                    height: 16,
+                    width: 16,
+                    tintColor: config.colors.lightGrey2Color,
+                    resizeMode: "contain",
+                    marginHorizontal: 20,
+                  }}
+                />
+                <Text
+                  style={{
+                    fontFamily: config.fonts.MediumFont,
+                    fontSize: 14,
+                    lineHeight: 16,
+                    color: config.colors.lightGrey2Color,
+                  }}
+                  onPress={() => {
+                    setShowStartDate(true);
+                    setIndex(index);
+                  }}
+                >
+                  {input?.startDate ? input.startDate : `Start Date`}
+                </Text>
+              </View>
+              <View
+                style={{
+                  height: 50,
+                  marginTop: 15,
+                  borderRadius: 12,
+                  flexDirection: "row",
+                  // justifyContent:',
+                  alignItems: "center",
+                  width: "45%",
+                  borderWidth: 1,
+                  borderColor: config.colors.lightGreyColor,
+                }}
+              >
+                <Image
+                  source={config.images.CALENDAR_ICON}
+                  style={{
+                    height: 16,
+                    width: 16,
+                    tintColor: config.colors.lightGrey2Color,
+                    resizeMode: "contain",
+                    marginHorizontal: 20,
+                  }}
+                />
+                <Text
+                  style={{
+                    fontFamily: config.fonts.MediumFont,
+                    fontSize: 14,
+                    lineHeight: 16,
+                    color: config.colors.lightGrey2Color,
+                  }}
+                  onPress={() => {
+                    setShowEndDate(true);
+                    setIndex(index);
+                  }}
+                >
+                  {input.endDate ? input?.endDate : `End Date`}
+                </Text>
+              </View>
+            </View>
           </View>
         ))}
 
-        <View
+        {/* <View
           style={{
             flexDirection: "row",
             justifyContent: "space-between",
@@ -377,19 +593,25 @@ const UserCreateTrip = ({ navigation }) => {
                 lineHeight: 16,
                 color: config.colors.lightGrey2Color,
               }}
-              onPress={() => setShowEndDate(true)}
-            >
+              onPress={() => 
+                {
+                 setShowEndDate(true)
+                  }
+                }
+                >
               {endDate != "" ? endDate : `End Date`}
             </Text>
           </View>
-        </View>
+        </View> */}
 
         <AppButton
           text={"Add Another Destination"}
           onPress={() => {
-            if (destination?.[destination.length - 1]?.value != "") {
-              addInput();
-            }
+            handleAddInput();
+            // if (destination?.[destination.length - 1]?.value != "") {
+            //   // addInput();
+            //   handleAddInput()
+            // }else{alert('vndknvfkd')}
           }}
           buttonStyle={{ marginVertical: 20 }}
         />
@@ -453,40 +675,57 @@ const UserCreateTrip = ({ navigation }) => {
             // marginTop: 15,
           }}
         >
-          <TouchableOpacity
-            style={{
-              marginVertical: 8,
-              flexDirection: "row",
-              marginRight: 8,
-              justifyContent: "space-between",
-              alignItems: "center",
-              paddingHorizontal: 12,
-              paddingVertical: 7,
-              borderRadius: 18,
-              borderWidth: 1,
-              borderColor: config.colors.yellowColor,
-              backgroundColor:
-                isAllSelected || activities?.length == 5
+          {userGetActivitiesResponse?.results?.listActivity?.map((item, index) => {
+            return (
+              <TouchableOpacity
+              style={{
+                marginRight: 8,
+                marginVertical: 8,
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center",
+                paddingHorizontal: 12,
+                paddingVertical: 7,
+                borderRadius: 18,
+                borderWidth: 1,
+                borderColor: config.colors.yellowColor,
+                backgroundColor: activities.includes(item?._id)
                   ? config.colors.yellowColor
                   : config.colors.white,
-            }}
-            onPress={() => {
-              handleSelectAll();
-            }}
-          >
-            <Text
-              style={{
-                fontSize: 12,
-                fontFamily: config.fonts.SemiboldFont,
-                lineHeight: 14,
-                color: isAllSelected
-                  ? config.colors.white
-                  : config.colors.yellowColor,
               }}
-            >{`All`}</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
+              onPress={() => {
+                // setSelectActivity("Camping");
+                addSelectActivity(item?._id);
+              }}
+            >
+              <Image
+                source={{uri: item?.uploadImage?.[0]}}
+                style={{
+                  height: 20,
+                  width: 20,
+                  marginRight: 5,
+                  tintColor: activities?.includes(item?._id)
+                    ? config.colors.white
+                    : config.colors.yellowColor,
+                  resizeMode: "contain",
+                }}
+              />
+              <Text
+                style={{
+                  fontSize: 12,
+                  fontFamily: config.fonts.SemiboldFont,
+                  lineHeight: 14,
+                  color: activities?.includes(item?._id)
+                    ? config.colors.white
+                    : config.colors.yellowColor,
+                }}
+              >{item?.activityName}</Text>
+            </TouchableOpacity>
+  
+            )
+          })}
+         
+          {/* <TouchableOpacity
             style={{
               marginRight: 8,
               marginVertical: 8,
@@ -705,7 +944,7 @@ const UserCreateTrip = ({ navigation }) => {
                   : config.colors.yellowColor,
               }}
             >{`Hiking`}</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
 
         <Text
@@ -986,7 +1225,9 @@ const UserCreateTrip = ({ navigation }) => {
 
         <AppButton
           text={"Submit"}
-          onPress={() => callUserCreateTripApi()}
+          onPress={() => {
+            callUserCreateTripApi();
+          }}
           buttonStyle={{
             marginVertical: 20,
           }}

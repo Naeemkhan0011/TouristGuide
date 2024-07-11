@@ -16,6 +16,7 @@ import AppButton from '../../components/AppButton';
 import {UserForgotPasswordReducer} from '../../redux/reducers';
 import { SagaActions } from '../../redux/sagas/SagaActions';
 import { useDispatch, useSelector } from 'react-redux';
+import Toast from 'react-native-toast-message';
 
 const GuideForgotPassword = ({navigation}) => {
   const dispatch = useDispatch();
@@ -57,6 +58,7 @@ const GuideForgotPassword = ({navigation}) => {
           type: 'custom',
           text1: forgotPasswordErrorResponse?.message,
         });
+        dispatch(UserForgotPasswordReducer.removeUserForgotPasswordResponse())
       }
     }
   }, [forgotPasswordErrorResponse]);
@@ -94,15 +96,10 @@ const GuideForgotPassword = ({navigation}) => {
       });
     }
    
-    if (countryCode == '') {
-     return Toast.show({
-        type: 'custom',
-        text1: 'Please select country code',
-      });
-    }
+    
     const payload = {
       mobileNumber: mobileNumber,
-      countryCode: countryCode,
+      countryCode: '+966',
       type: "local"
     };
     dispatch({type: SagaActions.USER_FORGOT_PASSWORD, payload});
@@ -198,7 +195,7 @@ const GuideForgotPassword = ({navigation}) => {
               <Text
                 style={{
                   marginHorizontal: 6,
-                  fontFamily: config.fonts.MediumFont,
+                  fontFamily: config.fonts.LatoRegularFont,
                   fontSize: 14,
                   lineHeight: 16,
                   color: config.colors.lightGrey2Color,

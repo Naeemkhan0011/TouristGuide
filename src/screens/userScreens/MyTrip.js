@@ -84,7 +84,7 @@ const MyTrip = ({ navigation }) => {
 
         {trips?.map((item, index) => {
           return (
-            <View
+            <TouchableOpacity
               style={{
                 height: 184,
                 marginVertical: 10,
@@ -95,6 +95,9 @@ const MyTrip = ({ navigation }) => {
                 borderColor: config.colors.borderColor,
               }}
               key={index}
+              onPress={() => {
+                navigation.navigate(config.routes.USER_TRIP_DETAIL, {tripId: item?._id})
+              }}
             >
               <View
                 style={{
@@ -176,7 +179,7 @@ const MyTrip = ({ navigation }) => {
                       color: config.colors.white,
                     }}
                   >
-                    {"Ali Ahmed Al Qahtani"}
+                    {item?.guestInfo?.[0]?.fullName}
                   </Text>
                   <Text
                     style={{
@@ -186,7 +189,7 @@ const MyTrip = ({ navigation }) => {
                       color: config.colors.white,
                     }}
                   >
-                    {"Booking Id : AH1234"}
+                    {"Booking Id : "+Date?.now()}
                   </Text>
                   <View
                     style={{
@@ -285,7 +288,7 @@ const MyTrip = ({ navigation }) => {
                   >{`Chat`}</Text>
                 </TouchableOpacity>
               </View>
-            </View>
+            </TouchableOpacity>
           );
         })}
         </>)}
