@@ -87,11 +87,11 @@ const UserUpdatePassword = ({navigation, route}) => {
     if(confirmPassword != password){
       return Toast.show({
         type: 'custom',
-        text1: 'Password not Match'
+        text1: 'Password and confirm password should be match'
       })
     }
     const payload = {
-      countryCode: route?.params?.code,
+      countryCode: route?.params?.from == 'guideOtp'  ? '+966' : route?.params?.code ,
       mobileNumber: route?.params?.mobileNo, 
       password: password,
       type: route?.params?.from == 'guideOtp' ?  'local' : "guest"
@@ -132,9 +132,11 @@ const UserUpdatePassword = ({navigation, route}) => {
             fontSize: 16,
             lineHeight: 28,
             color: config.colors.blackColor,
-          }}>{`Create a new password that is at least 8 characters long and not match with previous.`}</Text>
+          }}>{`Create a new password that is at least 8 characters long .`}</Text>
 
-        <View style={styles.inputcss1}>
+        <View style={{
+          marginTop:40
+        }}>
           <AppTextInput
            style={{
             height: 52,

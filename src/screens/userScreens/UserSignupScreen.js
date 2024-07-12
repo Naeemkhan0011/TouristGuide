@@ -19,6 +19,7 @@ import AppButton from "../../components/AppButton";
 import { useDispatch, useSelector } from "react-redux";
 import { CountryPicker } from "react-native-country-codes-picker";
 import { UserSignupReducer } from "../../redux/reducers";
+import { parsePhoneNumberFromString } from 'libphonenumber-js';
 import Toast from "react-native-toast-message";
 import { launchImageLibrary } from "react-native-image-picker";
 import { SagaActions } from "../../redux/sagas/SagaActions";
@@ -31,7 +32,7 @@ const UserSignupScreen = ({ navigation, route }) => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [mobileNumber, setMobileNumber] = useState("");
-  const [country, setCountry] = useState("India");
+  const [country, setCountry] = useState("Saudi Arabia");
   const [date_of_birth, setDate_of_birth] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -44,7 +45,7 @@ const UserSignupScreen = ({ navigation, route }) => {
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [showCountryCode, setShowCountryCode] = useState(false);
   const [showCountryName, setShowCountryName] = useState(false);
-  const [countryCode, setCountryCode] = useState("+91");
+  const [countryCode, setCountryCode] = useState("+966");
   const [countryFlag, setCountryFlag] = useState("");
   const [isFocused, setIsFocused] = useState(false);
   const [isFocused1, setIsFocused1] = useState(false);
@@ -196,9 +197,20 @@ const UserSignupScreen = ({ navigation, route }) => {
     return inputDate <= eighteenYearsAgo;
   };
 
+
+  
   //api call
 
   const callUserSignupApi = () => {
+    const fullPhoneNumber = `${countryCode}${mobileNumber}`;
+    const parsedPhoneNumber = parsePhoneNumberFromString(fullPhoneNumber);
+
+    if (!(parsedPhoneNumber && parsedPhoneNumber.isValid())) {
+      return Toast.show({
+        type: 'custom',
+        text1: 'Please enter valid mobile no',
+      });
+    }
     const validDate = dateValidate(date_of_birth);
     var emailRegex = /^([a-z0-9_\-\.])+\@([a-z0-9_\-\.])+\.([a-z]{2,4})$/;
     var passwordRegex =
@@ -208,10 +220,10 @@ const UserSignupScreen = ({ navigation, route }) => {
     const result = emailRegex.test(email);
     console.log("result", result);
 
-    if (firstName == "") {
+    if (firstName == "" || firstName.length < 4) {
       return Toast.show({
         type: "custom",
-        text1: "Please enter first name",
+        text1: "Please enter full name",
       });
     }
 
@@ -232,7 +244,7 @@ const UserSignupScreen = ({ navigation, route }) => {
     if (email == "") {
       return Toast.show({
         type: "custom",
-        text1: "Please enter email ",
+        text1: "Please enter your email id first  ",
       });
     }
 
@@ -253,7 +265,7 @@ const UserSignupScreen = ({ navigation, route }) => {
     if (mobileNumber == "") {
       return Toast.show({
         type: "custom",
-        text1: "Please enter mobile number  ",
+        text1: "Please enter mobile no",
       });
     }
 
@@ -264,12 +276,7 @@ const UserSignupScreen = ({ navigation, route }) => {
       });
     }
 
-    if (date_of_birth == "") {
-      return Toast.show({
-        type: "custom",
-        text1: "Please enter DOB   ",
-      });
-    }
+   
 
     if (date_of_birth == "") {
       return Toast.show({
@@ -288,7 +295,7 @@ const UserSignupScreen = ({ navigation, route }) => {
     if (matchPassword == false) {
       return Toast.show({
         type: "custom",
-        text1: "Please enter valid password   ",
+        text1: "Please enter valid password ",
       });
     }
 
@@ -309,7 +316,7 @@ const UserSignupScreen = ({ navigation, route }) => {
     if (confirmPassword != password) {
       return Toast.show({
         type: "custom",
-        text1: "Please enter valid password   ",
+        text1: "Password and confirm password should be match",
       });
     }
 
@@ -419,6 +426,7 @@ const UserSignupScreen = ({ navigation, route }) => {
             keyboardType={"default"}
             onChangeText={(val) => setFirstName(val.replace(/[^a-zA-Z ]/g, ""))}
             value={firstName}
+            maxLength={32}
             leftIcon={config.images.USER_ICON}
             leftIconStyle={{
               height: 20,
@@ -481,7 +489,7 @@ const UserSignupScreen = ({ navigation, route }) => {
                   color: config.colors.lightGrey2Color,
                 }}
               >
-                {countryFlag ? countryFlag : "🇮🇳"}
+                {countryFlag ? countryFlag : "🇸🇦"}
               </Text>
               <Text
                 style={{
@@ -989,7 +997,7 @@ const UserSignupScreen = ({ navigation, route }) => {
             >
               {filePath?.length != 0
                 ? `${filePath?.name}`
-                : "Upload Passport Image"}
+                : "Upload Passport Image (optional)"}
             </Text>
           </TouchableOpacity>
         </View>

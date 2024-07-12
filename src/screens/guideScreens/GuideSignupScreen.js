@@ -119,11 +119,21 @@ const GuideSignupScreen = ({navigation, route}) => {
     setDatePickerVisibility(true);
   };
   
-  const handleConfirm = date => {
-    console.log('A date has been picked: ', date);
-    setDate_of_birth(moment(date).format('YYYY-MM-DD'));
-    setDatePickerVisibility(false);
+  const handleConfirm = (date) => {
+    console.warn("A date has been picked: ", date);
+    const validDate = dateValidate(date);
+    if (!validDate) {
+      setDatePickerVisibility(false);
+      Toast.show({
+        type: "custom",
+        text1: "Your age must be more than 18.",
+      });
+    } else {
+      setDate_of_birth(moment(date).format("YYYY-MM-DD"));
+      setDatePickerVisibility(false);
+    }
   };
+ 
 
   const getDeviceInfo = async () => {
     const deviceId = await DeviceInfo.getUniqueId();
@@ -194,8 +204,8 @@ const GuideSignupScreen = ({navigation, route}) => {
 
     if (!toggle) {
       return Toast.show({
-        type: 'custom',
-        text1: 'Please select checkbox to continue',
+        type: "custom",
+        text1: "Please agree terms of service & privacy policy to continue",
       });
     }
 
@@ -209,7 +219,7 @@ const GuideSignupScreen = ({navigation, route}) => {
     if (email == '') {
       return Toast.show({
         type: 'custom',
-        text1: 'Please enter email ',
+        text1: 'Please enter your email id first   ',
       });
     }
 
@@ -230,7 +240,7 @@ const GuideSignupScreen = ({navigation, route}) => {
     if (mobileNumber == '') {
       return Toast.show({
         type: 'custom',
-        text1: 'Please enter mobile number  ',
+        text1: 'Please enter mobile no ',
       });
     }
 
@@ -277,7 +287,7 @@ const GuideSignupScreen = ({navigation, route}) => {
     if (confirmPassword != password) {
       return Toast.show({
         type: 'custom',
-        text1: `Please didn't match`,
+        text1: `Password and confirm password should be match`,
       });
     }
 

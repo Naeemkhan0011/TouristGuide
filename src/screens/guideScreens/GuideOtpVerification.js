@@ -23,6 +23,9 @@ const GuideOtpVerification = ({navigation, route}) => {
   const otpInput = useRef(null);
   const [otpvalue, setOtpValue] = useState('');
   const [secs, setSecs] = useState(30);
+  const [mins, setMins] = useState('00');
+
+
   const userOtpVerifyResponse = useSelector(
     UserVerifyOtpReducer.selectUserVerifyOtpData,
   );
@@ -46,6 +49,7 @@ const GuideOtpVerification = ({navigation, route}) => {
   useEffect(() => {
     if (forgotPasswordResponse != null) {
       if (forgotPasswordResponse?.error == false) {
+        onResendPress()
         Alert.alert('OTP', `Your otp is: ${forgotPasswordResponse?.results?.otp}`, [
           {text: 'Ok', onPress: () => console.log('OK Pressed')},
         ]);
@@ -138,7 +142,7 @@ const GuideOtpVerification = ({navigation, route}) => {
   
     const payload = {
       mobileNumber: route?.params?.mobileNo,
-      countryCode: route?.params?.code,
+      countryCode: '+966',
       type: "local"
     };
     dispatch({type: SagaActions.USER_FORGOT_PASSWORD, payload});
@@ -146,10 +150,16 @@ const GuideOtpVerification = ({navigation, route}) => {
 
 
   const callVerifyOtpApi = () => {
+    if(otpvalue == '' || otpvalue?.length < 6){
+      Toast.show({
+        type: 'custom',
+        text1: 'Please enter 6 digit otp',
+      })
+    }
     const payload = {
       otp: otpvalue,
       deviceId: '1234',
-      countryCode: route?.params?.code,
+      countryCode: '+966',
       mobileNumber: route?.params?.mobileNo,
       type: 'local',
     };
@@ -209,6 +219,7 @@ const GuideOtpVerification = ({navigation, route}) => {
             }}>{`Code`}</Text>
           <OTPTextInput
             ref={otpInput}
+            autoFocus={true}
             inputCount={6}
             defaultValue={otpvalue}
             handleTextChange={value => {
@@ -228,9 +239,9 @@ const GuideOtpVerification = ({navigation, route}) => {
           buttonStyle={{marginVertical: 30}}
         />
 
-        <TouchableOpacity 
+        <View 
         style={{flexDirection: 'row', alignSelf: 'center'}} 
-        onPress={()=>{callForgotPasswordApi()}}>
+        >
           <Text
             style={{
               textAlign: 'center',
@@ -240,7 +251,7 @@ const GuideOtpVerification = ({navigation, route}) => {
               //  textDecorationColor: config.colors.blackColor,
               lineHeight: 26,
               color: config.colors.blackColor,
-            }}>{` I didn’t receive a code?  `}</Text>
+            }}>{secs != '00' ? 'Resend code after' : ` Didn’t receive a code?  `}</Text>
           <Text
             style={{
               textDecorationLine: 'none',
@@ -251,9 +262,34 @@ const GuideOtpVerification = ({navigation, route}) => {
               color: config.colors.primaryColor,
             }}>
             {' '}
-            {`Resend`}
+            {secs != '00' ? (
+          <Text style={{
+            textDecorationLine: 'none',
+              textDecorationColor: config.colors.white,
+              fontFamily: config.fonts.MediumFont,
+              fontSize: 16,
+              lineHeight: 26,
+              color: config.colors.primaryColor,
+          }}>
+            {' '}
+            {mins}:{secs < 10 && 0}
+            {secs} {`sec`}
           </Text>
-        </TouchableOpacity>
+        ) : <Text style={{
+          textDecorationLine: 'none',
+              textDecorationColor: config.colors.white,
+              fontFamily: config.fonts.MediumFont,
+              fontSize: 16,
+              lineHeight: 26,
+              color: config.colors.primaryColor,
+        }}
+        onPress={()=>{
+          callForgotPasswordApi()
+          }} 
+        >{`Resend`}</Text>}
+
+          </Text>
+        </View>
       </View>
     </SafeAreaView>
   );

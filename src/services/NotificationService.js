@@ -2,8 +2,6 @@ import messaging from '@react-native-firebase/messaging';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Alert, Platform } from 'react-native';
 import Toast from 'react-native-toast-message';
-import PushNotification from 'react-native-push-notification';
-import PushNotificationIOS from '@react-native-community/push-notification-ios';
 // import NavigationService from '../Navigation/NavigationService';
 // import notifee, { AndroidImportance } from '@notifee/react-native';
 

@@ -295,7 +295,7 @@ const UserCreateTrip = ({ navigation }) => {
     if (date1 > date2) {
       return Toast.show({
         type: "custom",
-        text1: "start date should be less than end date",
+        text1: "Start date should be less than end date",
       });
     }
     if (numberOfGuest == "") {

@@ -47,6 +47,7 @@ const GuideLoginScreen = ({navigation, route}) => {
   useEffect(() => {
     if (userLoginResponse != null) {
       if (userLoginResponse?.error == false) {
+        handleChecked()
         AsyncStorage.setItem(
           config.AsyncKeys.USER_LOGGED_IN,
           JSON.stringify(true),
@@ -83,8 +84,47 @@ const GuideLoginScreen = ({navigation, route}) => {
   useFocusEffect(
     useCallback(() => {
       getDeviceInfo();
+      autoFillCredentials();
     }, []),
   );
+
+  const handleChecked = () => {
+    if (toggle) {
+      saveCredentials(mobileNumber, password);
+    }
+  };
+
+  const saveCredentials = async (username, password) => {
+    try {
+      // Using AsyncStorage
+      await AsyncStorage.setItem("guideUsername", username);
+      await AsyncStorage.setItem("guidePassword", password);
+      
+      console.log("Credentials saved successfully!");
+    } catch (error) {
+      console.log("Error saving credentials:", error);
+    }
+  };
+
+  const autoFillCredentials = async () => {
+    try {
+      // Using AsyncStorage
+      const savedUsername = await AsyncStorage.getItem("guideUsername");
+      const savedPassword = await AsyncStorage.getItem("guidePassword");
+      if (savedUsername && savedPassword) {
+        // Auto-fill the input fields
+        console.log(savedUsername, savedPassword);
+        setMobileNumber(savedUsername);
+        setPassword(savedPassword);
+        setCountryCode(savedCode);
+        setCountryFlag(savedFlag);
+      }
+    } catch (error) {
+      console.log("Error retrieving credentials:", error);
+    }
+  };
+
+
 
   //function call
   const validatePassword = (val) => {
@@ -107,6 +147,7 @@ const GuideLoginScreen = ({navigation, route}) => {
         text1: 'Please enter mobile number',
       });
     }
+   
 
     // if (countryCode == '') {
     //   return Toast.show({
@@ -128,12 +169,12 @@ const GuideLoginScreen = ({navigation, route}) => {
       });
     }
 
-    if (!toggle) {
-      return Toast.show({
-        type: 'custom',
-        text1: 'Please select checkbox to continue',
-      });
-    }
+    // if (!toggle) {
+    //   return Toast.show({
+    //     type: 'custom',
+    //     text1: 'Please select checkbox to continue',
+    //   });
+    // }
     const payload = {
       countryCode: '+966',
       mobileNumber: mobileNumber,

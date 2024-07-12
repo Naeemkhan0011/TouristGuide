@@ -15,6 +15,7 @@ import AppHeader from '../../components/AppHeader';
 import AppTextInput from '../../components/AppTextInput';
 import {removeListener} from '@reduxjs/toolkit';
 import AppButton from '../../components/AppButton';
+import { parsePhoneNumberFromString } from 'libphonenumber-js';
 import {useDispatch, useSelector} from 'react-redux';
 import {UserForgotPasswordReducer} from '../../redux/reducers';
 import Toast from 'react-native-toast-message';
@@ -32,7 +33,7 @@ const UserForgotPassword = ({navigation}) => {
   const [mobileNumber, setMobileNumber] = useState('');
   const [toggle, setToggle] = useState(false);
   const [showCountryCode, setShowCountryCode] = useState(false);
-  const [countryCode, setCountryCode] = useState('');
+  const [countryCode, setCountryCode] = useState('+966');
   const [countryFlag, setCountryFlag] = useState('');
 
   //hook call
@@ -64,12 +65,23 @@ const UserForgotPassword = ({navigation}) => {
     }
   }, [forgotPasswordErrorResponse]);
 
+ 
+
   // api call
   const callForgotPasswordApi = () => {
+    const fullPhoneNumber = `${countryCode}${mobileNumber}`;
+    const parsedPhoneNumber = parsePhoneNumberFromString(fullPhoneNumber);
+
+    if (!(parsedPhoneNumber && parsedPhoneNumber.isValid())) {
+      return Toast.show({
+        type: 'custom',
+        text1: 'Please enter valid mobile no',
+      });
+    }
     if (mobileNumber == '') {
      return Toast.show({
         type: 'custom',
-        text1: 'Please enter mobile number',
+        text1: 'Please enter registered mobile no',
       });
     }
    
@@ -191,7 +203,7 @@ const UserForgotPassword = ({navigation}) => {
                   lineHeight: 16,
                   color: config.colors.lightGrey2Color,
                 }}>
-                {countryFlag ? countryFlag : '🇮🇳'}
+                {countryFlag ? countryFlag : "🇸🇦"}
               </Text>
               <Text
                 style={{
@@ -201,7 +213,7 @@ const UserForgotPassword = ({navigation}) => {
                   lineHeight: 16,
                   color: config.colors.lightGrey2Color,
                 }}>
-                {countryCode ? countryCode : '+91'}
+                {countryCode ? countryCode : '+966'}
               </Text>
               <Image
                 source={config.images.RIGHT_ARROW}

@@ -92,7 +92,7 @@ const GuideForgotPassword = ({navigation}) => {
     if (mobileNumber == '') {
      return Toast.show({
         type: 'custom',
-        text1: 'Please enter mobile number',
+        text1: 'Please enter valid mobile no',
       });
     }
    
