@@ -47,6 +47,21 @@ const GuideLoginScreen = ({navigation, route}) => {
   useEffect(() => {
     if (userLoginResponse != null) {
       if (userLoginResponse?.error == false) {
+        if(userLoginResponse?.results?.user?.otpVerified == false){
+          Toast.show({
+            type:'custom',
+            text1: 'Account not verified'
+          })
+          setTimeout(() => {
+            navigation.navigate(config.routes.GUIDE_OTP_VERIFICATION, {
+              mobileNo: mobileNumber,
+              code: countryCode,
+              otp: userLoginResponse?.results?.otp,
+              from: "login",
+            });
+            dispatch(UserLoginReducer.removeUserLoginResponse());
+          }, 1000);
+        }else{
         handleChecked()
         AsyncStorage.setItem(
           config.AsyncKeys.USER_LOGGED_IN,
@@ -65,7 +80,7 @@ const GuideLoginScreen = ({navigation, route}) => {
         });
         console.log('userLoginResponse', JSON.stringify(userLoginResponse));
         dispatch(UserLoginReducer.removeUserLoginResponse());
-      }
+      }}
     }
   }, [userLoginResponse]);
 

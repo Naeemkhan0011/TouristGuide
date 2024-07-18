@@ -1,14 +1,16 @@
 import {
+  BackHandler,
   Image,
   SafeAreaView,
   ScrollView,
   StatusBar,
   StyleSheet,
   Text,
+  ToastAndroid,
   TouchableOpacity,
   View,
 } from 'react-native';
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import config from '../../config';
 import {useDispatch, useSelector} from 'react-redux';
 import {GuideGetProfileReducer} from '../../redux/reducers';
@@ -18,11 +20,35 @@ import Toast from 'react-native-toast-message';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const GuideHomeScreen = ({navigation}) => {
+  const backPressed = useRef(0);
   const dispatch = useDispatch();
   const [guideData, setGuideData] = useState(null);
   const guideGetProfileResponse = useSelector(
     GuideGetProfileReducer.selectGuideGetProfileData,
+
   );
+
+  useEffect(() => {
+    const backAction = () => {
+      const timeNow = new Date().getTime();
+
+      if (backPressed.current && timeNow - backPressed.current < 2000) {
+        // If back is pressed twice within 2 seconds, exit the app
+        BackHandler.exitApp();
+        return true;
+      }
+
+      backPressed.current = timeNow;
+      ToastAndroid.show('Press back again to exit', ToastAndroid.SHORT);
+      return true;
+    };
+
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
+
+    return () => {
+      backHandler.remove();
+    };
+  }, []);
 
   // hooks call
   useEffect(() => {
@@ -197,10 +223,7 @@ const callGetGuideProfile = () => {
               borderColor: config.colors.borderColor,
             }}
             onPress={() => {
-              Toast.show({
-                 type: 'custom',
-                text1:'Coming Soon'
-              })
+              navigation.navigate(config.routes.GUIDE_TRIP_MANAGEMENT)
             }}>
             <Image
               style={{
@@ -233,10 +256,7 @@ const callGetGuideProfile = () => {
               borderColor: config.colors.borderColor,
             }}
             onPress={() => {
-              Toast.show({
-                 type: 'custom',
-                text1:'Coming Soon'
-              })
+             navigation.navigate(config.routes.GUIDE_EXPLORE_GUEST)
             }}>
             <Image
               style={{

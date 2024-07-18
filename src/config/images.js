@@ -75,4 +75,6 @@ export default {
     BONFIRE_ICON: require('../assets/images/bonfire.png'),
     WILDLIFE_ICON: require('../assets/images/wildlife.png'),
     DELETE_ICON: require('../assets/images/delete.png'),
+    USER_ICON1: require('../assets/images/user_icon.png'),
+    LOCATION_ICON: require('../assets/images/location_icon.png'),
 }

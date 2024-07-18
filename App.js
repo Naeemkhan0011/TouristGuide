@@ -46,6 +46,7 @@ const App = () => {
             }}></View>
             <Text
           style={{
+            paddingRight:6,
             marginLeft:15,
             fontFamily: config.fonts.HeadingFont,
             fontSize: 14,

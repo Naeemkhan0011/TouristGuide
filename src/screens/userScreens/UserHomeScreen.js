@@ -1,5 +1,6 @@
 import {
   Animated,
+  BackHandler,
   Image,
   Modal,
   Platform,
@@ -11,10 +12,11 @@ import {
   Switch,
   Text,
   TextInput,
+  ToastAndroid,
   TouchableOpacity,
   View,
 } from "react-native";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import config from "../../config";
 import LinearGradient from 'react-native-linear-gradient';
 import { useDispatch, useSelector } from "react-redux";
@@ -35,8 +37,10 @@ import Toast from "react-native-toast-message";
 
 const Tab = createMaterialTopTabNavigator();
 
-const UserHomeScreen = () => {
+const UserHomeScreen = ({navigation}) => {
   const dispatch = useDispatch();
+  const backPressed = useRef(0);
+
   const [isEnabled, setEnabled] = useState(false);
   const [animatedValue] = useState(new Animated.Value(isEnabled ? 1 : 0));
   const userFilterApiResponse = useSelector(
@@ -69,6 +73,29 @@ const UserHomeScreen = () => {
   const [selectActivity, setSelectActivity] = useState("");
   const [selectSpatialCare, setSelectSpatialCare] = useState("");
   const [renderSwitch, setRenderSwitch] = useState(true);
+
+
+  useEffect(() => {
+    const backAction = () => {
+      const timeNow = new Date().getTime();
+
+      if (backPressed.current && timeNow - backPressed.current < 2000) {
+        // If back is pressed twice within 2 seconds, exit the app
+        BackHandler.exitApp();
+        return true;
+      }
+
+      backPressed.current = timeNow;
+      ToastAndroid.show('Press back again to exit', ToastAndroid.SHORT);
+      return true;
+    };
+
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
+
+    return () => {
+      backHandler.remove();
+    };
+  }, []);
 
   // hooks call
 
@@ -885,11 +912,14 @@ const UserHomeScreen = () => {
         {userOffRoadTripResponse?.results?.localUsersWithOffRoadTrips?.map(
           (item, index) => {
             return (
-              <View
+              <TouchableOpacity
                 style={{
                   marginTop: 20,
                 }}
                 key={index}
+                onPress={() => {
+                  // navigation.navigate(config.routes.GUIDE_DETAIL)
+                }}
               >
                 <Image
                   source={config.images.TRIP_IMG}
@@ -1037,7 +1067,7 @@ const UserHomeScreen = () => {
                     >{`Trekking`}</Text>
                   </TouchableOpacity>
                 </View>
-              </View>
+              </TouchableOpacity>
             );
           }
         )}

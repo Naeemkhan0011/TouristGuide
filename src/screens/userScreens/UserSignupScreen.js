@@ -19,7 +19,7 @@ import AppButton from "../../components/AppButton";
 import { useDispatch, useSelector } from "react-redux";
 import { CountryPicker } from "react-native-country-codes-picker";
 import { UserSignupReducer } from "../../redux/reducers";
-import { parsePhoneNumberFromString } from 'libphonenumber-js';
+import { parsePhoneNumberFromString } from "libphonenumber-js";
 import Toast from "react-native-toast-message";
 import { launchImageLibrary } from "react-native-image-picker";
 import { SagaActions } from "../../redux/sagas/SagaActions";
@@ -32,7 +32,7 @@ const UserSignupScreen = ({ navigation, route }) => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [mobileNumber, setMobileNumber] = useState("");
-  const [country, setCountry] = useState("Saudi Arabia");
+  const [country, setCountry] = useState("India");
   const [date_of_birth, setDate_of_birth] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -45,8 +45,8 @@ const UserSignupScreen = ({ navigation, route }) => {
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [showCountryCode, setShowCountryCode] = useState(false);
   const [showCountryName, setShowCountryName] = useState(false);
-  const [countryCode, setCountryCode] = useState("+966");
-  const [countryFlag, setCountryFlag] = useState("");
+  const [countryCode, setCountryCode] = useState("+91");
+  const [countryFlag, setCountryFlag] = useState("🇮🇳");
   const [isFocused, setIsFocused] = useState(false);
   const [isFocused1, setIsFocused1] = useState(false);
   const [test1, setTest1] = useState("");
@@ -113,6 +113,7 @@ const UserSignupScreen = ({ navigation, route }) => {
   }, []);
 
   //function call
+
   const validatePassword = (val) => {
     let result1 = /[a-z]/.test(val) && /[A-Z]/.test(val);
     let result2 = /\d/.test(val) && /[!@#$%^&*(),.?":{}|<>]/.test(val);
@@ -130,6 +131,9 @@ const UserSignupScreen = ({ navigation, route }) => {
     setTest6(result3);
   };
 
+  //date calculate
+  const eighteenYearsAgo = moment().subtract(18, 'years').subtract(1, 'days').toDate();
+
   const showDatePicker = () => {
     setDatePickerVisibility(true);
   };
@@ -143,10 +147,7 @@ const UserSignupScreen = ({ navigation, route }) => {
     const validDate = dateValidate(date);
     if (!validDate) {
       hideDatePicker();
-      Toast.show({
-        type: "custom",
-        text1: "Your age must be more than 18.",
-      });
+     
     } else {
       setDate_of_birth(moment(date).format("YYYY-MM-DD"));
       hideDatePicker();
@@ -197,20 +198,12 @@ const UserSignupScreen = ({ navigation, route }) => {
     return inputDate <= eighteenYearsAgo;
   };
 
-
-  
   //api call
 
   const callUserSignupApi = () => {
     const fullPhoneNumber = `${countryCode}${mobileNumber}`;
     const parsedPhoneNumber = parsePhoneNumberFromString(fullPhoneNumber);
 
-    if (!(parsedPhoneNumber && parsedPhoneNumber.isValid())) {
-      return Toast.show({
-        type: 'custom',
-        text1: 'Please enter valid mobile no',
-      });
-    }
     const validDate = dateValidate(date_of_birth);
     var emailRegex = /^([a-z0-9_\-\.])+\@([a-z0-9_\-\.])+\.([a-z]{2,4})$/;
     var passwordRegex =
@@ -220,24 +213,29 @@ const UserSignupScreen = ({ navigation, route }) => {
     const result = emailRegex.test(email);
     console.log("result", result);
 
-    if (firstName == "" || firstName.length < 4) {
+    if (firstName == "") {
       return Toast.show({
         type: "custom",
         text1: "Please enter full name",
       });
     }
-
-    if (!toggle) {
+    if (countryCode == "") {
       return Toast.show({
         type: "custom",
-        text1: "Please agree terms of service & privacy policy to continue",
+        text1: "Please select country code  ",
       });
     }
 
-    if (!validDate) {
+    if (mobileNumber == "") {
       return Toast.show({
         type: "custom",
-        text1: "Your age should be more then 18",
+        text1: "Please enter mobile number",
+      });
+    }
+    if (!(parsedPhoneNumber && parsedPhoneNumber.isValid())) {
+      return Toast.show({
+        type: "custom",
+        text1: "Please enter valid mobile number",
       });
     }
 
@@ -255,33 +253,24 @@ const UserSignupScreen = ({ navigation, route }) => {
       });
     }
 
-    if (country == "") {
-      return Toast.show({
-        type: "custom",
-        text1: "Please enter country name ",
-      });
-    }
-
-    if (mobileNumber == "") {
-      return Toast.show({
-        type: "custom",
-        text1: "Please enter mobile no",
-      });
-    }
-
-    if (countryCode == "") {
-      return Toast.show({
-        type: "custom",
-        text1: "Please select country code  ",
-      });
-    }
-
-   
-
     if (date_of_birth == "") {
       return Toast.show({
         type: "custom",
         text1: "Please enter DOB   ",
+      });
+    }
+
+    if (!validDate) {
+      return Toast.show({
+        type: "custom",
+        text1: "Your age should be more then 18",
+      });
+    }
+
+    if (country == "") {
+      return Toast.show({
+        type: "custom",
+        text1: "Please enter country name ",
       });
     }
 
@@ -317,6 +306,13 @@ const UserSignupScreen = ({ navigation, route }) => {
       return Toast.show({
         type: "custom",
         text1: "Password and confirm password should be match",
+      });
+    }
+
+    if (!toggle) {
+      return Toast.show({
+        type: "custom",
+        text1: "Please agree terms of service & privacy policy to continue",
       });
     }
 
@@ -373,6 +369,7 @@ const UserSignupScreen = ({ navigation, route }) => {
       <DateTimePickerModal
         isVisible={isDatePickerVisible}
         mode="date"
+        maximumDate={eighteenYearsAgo} // Set the maximum date
         onConfirm={handleConfirm}
         onCancel={hideDatePicker}
       />
@@ -489,7 +486,7 @@ const UserSignupScreen = ({ navigation, route }) => {
                   color: config.colors.lightGrey2Color,
                 }}
               >
-                {countryFlag ? countryFlag : "🇸🇦"}
+                {countryFlag ? countryFlag : "🇮🇳"}
               </Text>
               <Text
                 style={{
@@ -960,7 +957,13 @@ const UserSignupScreen = ({ navigation, route }) => {
             </Text>
           </View>
         )}
-
+        <Text style={{
+          marginTop: 12,
+          fontFamily: config.fonts.primaryColor,
+          fontSize:14,
+          lineHeight: 15,
+          color: config.colors.blackColor,
+        }}>{`Optional`}</Text>
         <View
           style={{
             height: 80,

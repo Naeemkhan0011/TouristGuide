@@ -17,6 +17,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SagaActions } from '../../redux/sagas/SagaActions';
 import Toast from 'react-native-toast-message';
+import { goToTopNavigation } from '../../components/NavigationRef';
 
 const GuideOtpVerification = ({navigation, route}) => {
   const dispatch = useDispatch();
@@ -81,15 +82,19 @@ const GuideOtpVerification = ({navigation, route}) => {
           type: 'custom',
           text1: userOtpVerifyResponse?.message,
         });
+        console.log('route?.params?.from',route?.params?.from == 'login');
         if (route?.params?.from == 'forgot') {
-          return navigation.navigate(config.routes.USER_UPDATE_PASSWORD, {
+           navigation.navigate(config.routes.USER_UPDATE_PASSWORD, {
             mobileNo: route?.params?.mobileNo,
-            code: route?.params?.code,
+            code: '+966',
             from: 'guideOtp'
           });
-        }
-        goToTopNavigation(config.routes.TAB_NAVIGATOR, {
-          userRole: route?.params?.userRole,
+          dispatch(UserVerifyOtpReducer.removeUserVerifyOtpResponse())
+        }else if (route?.params?.from == "signup") {
+        navigation.navigate(config.routes.ACCOUNT_SUCCESS, {
+          token: userOtpVerifyResponse?.results?.token,
+          userData: userOtpVerifyResponse?.results?.user,
+          type: 'local',
         });
 
         AsyncStorage.setItem(
@@ -105,17 +110,36 @@ const GuideOtpVerification = ({navigation, route}) => {
           JSON.stringify(userOtpVerifyResponse?.results?.token),
         );
         dispatch(UserVerifyOtpReducer.removeUserVerifyOtpResponse())
-      }
+      }else if (route?.params?.from == "login"){
+        AsyncStorage.setItem(
+          config.AsyncKeys.USER_LOGGED_IN,
+          JSON.stringify(true),
+        );
+        AsyncStorage.setItem(
+          config.AsyncKeys.USER_DATA,
+          JSON.stringify(userOtpVerifyResponse?.results?.user),
+        );
+        AsyncStorage.setItem(
+          config.AsyncKeys.USER_TOKEN,
+          JSON.stringify(userOtpVerifyResponse?.results?.token),
+        );
+        goToTopNavigation(config.routes.TAB_NAVIGATOR, {
+          userRole: "Local",
+        });
+        dispatch(UserVerifyOtpReducer.removeUserVerifyOtpResponse())
+      }}
     }
   }, [userOtpVerifyResponse]);
 
   useEffect(() => {
     if (userOtpVerifyErrorResponse != null) {
-      if (userOtpVerifyErrorResponse?.error == false) {
+      if (userOtpVerifyErrorResponse?.error != '') {
         Toast.show({
           type: 'custom',
           text1: userOtpVerifyErrorResponse?.message,
         });
+        setOtpValue('');
+        otpInput.current.clear();
         dispatch(UserVerifyOtpReducer.removeUserVerifyOtpResponse());
       }
     }

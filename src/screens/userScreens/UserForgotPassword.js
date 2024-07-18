@@ -75,13 +75,13 @@ const UserForgotPassword = ({navigation}) => {
     if (!(parsedPhoneNumber && parsedPhoneNumber.isValid())) {
       return Toast.show({
         type: 'custom',
-        text1: 'Please enter valid mobile no',
+        text1: 'Please enter valid mobile number',
       });
     }
     if (mobileNumber == '') {
      return Toast.show({
         type: 'custom',
-        text1: 'Please enter registered mobile no',
+        text1: 'Please enter registered mobile number',
       });
     }
    

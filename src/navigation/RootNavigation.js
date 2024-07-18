@@ -41,6 +41,8 @@ import GuideEditProfile from "../screens/guideScreens/GuideEditProfile";
 import UserEditProfile from "../screens/userScreens/UserEditProfile";
 import UserTripDetail from "../screens/userScreens/UserTripDetail";
 import GuideDetails from "../screens/userScreens/GuideDetails";
+import TripManagement from "../screens/guideScreens/TripManagement";
+import GuideExploreGuest from "../screens/guideScreens/GuideExploreGuest";
 
 const Stack = createNativeStackNavigator();
 
@@ -123,6 +125,10 @@ function RootNavigation() {
           name={config.routes.GUIDE_HOME_SCREEN}
           component={GuideHomeScreen}
         />
+        <Stack.Screen
+          name={config.routes.GUIDE_TRIP_MANAGEMENT}
+          component={TripManagement}
+        />
 
         <Stack.Screen
           name={config.routes.GUIDE_ACCOUNT}
@@ -190,6 +196,11 @@ function RootNavigation() {
         <Stack.Screen
           name={config.routes.USER_TRIP_DETAIL}
           component={UserTripDetail}
+        />
+
+        <Stack.Screen
+          name={config.routes.GUIDE_EXPLORE_GUEST}
+          component={GuideExploreGuest}
         />
 
         <Stack.Screen

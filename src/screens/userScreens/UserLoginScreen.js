@@ -31,6 +31,7 @@ import { removeUserLoginResponse } from "../../redux/reducers/UserReducer/UserLo
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const UserLoginScreen = ({ navigation, route }) => {
+  console.log(config.phoneNumber);
   const dispatch = useDispatch();
   const [showPassword, setShowPassword] = useState(true);
   const [mobileNumber, setMobileNumber] = useState("");
@@ -56,6 +57,21 @@ const UserLoginScreen = ({ navigation, route }) => {
   useEffect(() => {
     if (userLoginResponse != null) {
       if (userLoginResponse?.error == false) {
+        if(userLoginResponse?.results?.user?.otpVerified == false){
+          Toast.show({
+            type:'custom',
+            text1: 'Account not verified'
+          })
+          setTimeout(() => {
+            navigation.navigate(config.routes.USER_OTP_VERIFICATION, {
+              mobileNo: mobileNumber,
+              code: countryCode,
+              otp: userLoginResponse?.results?.otp,
+              from: "login",
+            });
+            dispatch(UserLoginReducer.removeUserLoginResponse());
+          }, 2000);
+        }else{
         handlechecked();
         AsyncStorage.setItem(
           config.AsyncKeys.USER_LOGGED_IN,
@@ -74,7 +90,7 @@ const UserLoginScreen = ({ navigation, route }) => {
         });
         console.log("userLoginResponse", JSON.stringify(userLoginResponse));
         dispatch(UserLoginReducer.removeUserLoginResponse());
-      }
+      }}
     }
   }, [userLoginResponse]);
 
@@ -158,21 +174,10 @@ const UserLoginScreen = ({ navigation, route }) => {
     const fullPhoneNumber = `${countryCode}${mobileNumber}`;
     const parsedPhoneNumber = parsePhoneNumberFromString(fullPhoneNumber);
 
-    if (!(parsedPhoneNumber && parsedPhoneNumber.isValid())) {
-      return Toast.show({
-        type: "custom",
-        text1: "Please enter valid mobile no",
-      });
-    }
+   
     var passwordRegex =
       /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,16}$/;
     const result = passwordRegex.test(password);
-    if (mobileNumber == "") {
-      return Toast.show({
-        type: "custom",
-        text1: "Please enter mobile number",
-      });
-    }
 
     if (countryCode == "") {
       return Toast.show({
@@ -180,6 +185,22 @@ const UserLoginScreen = ({ navigation, route }) => {
         text1: "Please select country code",
       });
     }
+    
+    if (mobileNumber == "") {
+      return Toast.show({
+        type: "custom",
+        text1: "Please enter mobile number",
+      });
+    }
+
+    if (!(parsedPhoneNumber && parsedPhoneNumber.isValid())) {
+      return Toast.show({
+        type: "custom",
+        text1: "Please enter valid mobile number",
+      });
+    }
+
+    
 
     if (password == "") {
       return Toast.show({
